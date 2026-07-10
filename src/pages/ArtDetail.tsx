@@ -147,7 +147,6 @@ export default function ArtDetail() {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 }

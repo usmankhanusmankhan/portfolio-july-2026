@@ -40,6 +40,7 @@
     color: var(--color-text-link);
     text-decoration: none;
     cursor: pointer;
+    font-family: inherit;
 }
 
 .link-button {

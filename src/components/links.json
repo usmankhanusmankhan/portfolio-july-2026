@@ -5,6 +5,13 @@
             "opensPopover": false,
             "href": "/about",
             "opensDrawer": false
+        },
+        {
+            "name": "Contact",
+            "opensPopover": false,
+            "href": "/contact",
+            "opensDrawer": false
         }
     ]
+    
 }
