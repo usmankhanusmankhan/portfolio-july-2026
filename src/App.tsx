@@ -5,7 +5,6 @@ import {
   RouterProvider,
   Outlet,
 } from "react-router-dom";
-import Home from "./pages/Home";
 import ProjectsPage from "./pages/ProjectsPage";
 import ReachOutPanel from "./pages/ReachOutPanel";
 import IBMQuantum from "./pages/IBMQuantum";
@@ -26,8 +25,7 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: "/", element: <Home /> },
-      { path: "/projects", element: <ProjectsPage /> },
+      { path: "/", element: <ProjectsPage /> },
       { path: "/reachoutpanel", element: <ReachOutPanel /> },
       { path: "/ibm-quantum", element: <IBMQuantum /> },
       { path: "/art/:id", element: <ArtDetail /> },
