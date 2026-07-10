@@ -1,0 +1,360 @@
+.bottomMenuWrapper {
+    display: flex;
+    justify-content: center;
+    padding-top: 32px;
+}
+
+.container {
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: 32px;
+    padding-top: 96px;
+}
+
+.successMetrics {
+    border-radius: 8px;
+    background-color: var(--color-bg);
+    background-image: linear-gradient(to bottom, var(--color-bg), var(--color-bg-list));
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 16px;
+    width: 100%;
+    align-items: top;
+}
+
+.successMetricsTextTitle {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.successMetricsTextDescription {
+    color: var(--color-text);
+    line-height: 22px;
+
+}
+
+
+
+.successMetricsIcon {
+    width: 24px;
+    height: 24px;
+}
+
+.successMetricsText {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.risk {
+    border-radius: 8px;
+    background-color: var(--color-badge-pink-bg);
+    background-image: linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end));
+    border: 1px solid var(--color-badge-pink-border);
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 16px;
+    width: 50%;
+    align-items: top;
+    width: 100%;
+    margin-bottom: 48px;
+}
+
+.constraint {
+    border-radius: 8px;
+    background-color: var(--color-neutral-bg);
+    border: 1px solid var(--color-neutral-border);
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 16px;
+    width: 50%;
+    align-items: top;
+    width: 100%;
+    margin-bottom: 48px;
+}
+
+
+.metricsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 48px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding-left: 48px;
+        padding-right: 48px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding-left: 96px;
+        padding-right: 96px;
+    }
+}
+
+.heroSection {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.heroTitle {
+    margin-bottom: 8px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.heroDescription {
+    font-size: 20px;
+    color: var(--color-text);
+    line-height: 28px;
+    margin-bottom: 24px;
+}
+
+.heroMeta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 16px;
+    color: var(--color-text);
+    margin-bottom: 48px;
+}
+
+.heroImagePlaceholder {
+    background-color: var(--color-neutral-border-light);
+    border-radius: 32px;
+}
+
+.section {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sectionWithBottomMargin {
+    margin-bottom: 128px;
+}
+
+.sectionWithLargeBottomMargin {
+    margin-bottom: 164px;
+}
+
+.sectionWithSmallBottomMargin {
+    margin-bottom: 96px;
+}
+
+
+.sectionLabel {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+}
+
+.sectionTitle {
+    font-size: 20px;
+    color: var(--color-text);
+    line-height: 28px;
+    max-width: 800px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.sectionTitleLargeMargin {
+    margin-bottom: 16px;
+}
+
+.sectionTitleSmallMargin {
+    margin-bottom: 32px;
+}
+
+.sectionText {
+    font-size: 20px;
+    color: var(--color-text);
+    line-height: 30px;
+    max-width: 800px;
+    margin-bottom: 48px;
+}
+
+.sectionTextLineHeight28 {
+    line-height: 28px;
+}
+
+.sectionTitleLineHeight30 {
+    line-height: 30px;
+}
+
+.imageContainer {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 32px;
+}
+
+.imageContainerGap16 {
+    gap: 16px;
+}
+
+.imageContainerNoMargin {
+    margin-bottom: 0;
+}
+
+.imageWrapper {
+    background-color: var(--color-neutral-border-light);
+    border: 1px solid var(--color-neutral-border-light);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 64px;
+    position: relative;
+}
+
+.designSolutionImageWrapper {
+    background-color: var(--color-surface-mint);
+    border: 1px solid var(--color-surface-mint-border);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 16px;
+    bottom: 16px;
+    width: 100%;
+    height: calc(100vh - 32px);
+    align-self: flex-start;
+}
+
+.designSolutionImageGradient {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 24px;
+    pointer-events: none;
+}
+
+.designSolutionImageGradient > * {
+    border-radius: 24px;
+}
+
+.designSolutionImage {
+    width: 80%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 24px;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.designSolutionContent {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 64px;
+    height: 100vh;
+}
+
+.designSolutionImageContainer {
+    flex: 1;
+    padding: 16px;
+    width: 100%;
+    height: 600vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.designSolutionSection {
+    max-width: 100vw;
+    height: 600vh;
+    margin: 0 auto;
+    flex-direction: row;
+    gap: 64px;
+    display: flex;
+    margin-bottom: 164px;
+}
+
+/* Simple stacked layout when width ≤ 960px */
+.designSolutionSectionNarrow {
+    max-width: 100%;
+    margin: 0 auto 96px;
+    padding: 0 24px;
+}
+
+.stackedSectionList {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stackedBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.stackedBlockParagraph {
+    display: flex;
+    flex-direction: column;
+}
+
+.stackedBlockContent {
+    background-color: var(--color-surface-mint);
+    border: 1px solid var(--color-surface-mint-border);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+}
+
+.stackedImageCaption {
+    font-size: 12px;
+    color: var(--color-text-neutral);
+    margin: 0 0 12px 0;
+    align-self: flex-start;
+}
+
+.stackedBlockImage {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+
+.imageCaption {
+    font-size: 12px;
+    color: var(--color-text-neutral);
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    margin: 0;
+    z-index: 1;
+}
+
+.image {
+    width: 90%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}

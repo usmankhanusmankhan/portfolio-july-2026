@@ -1,0 +1,16 @@
+{
+    "links": [
+        {
+            "name": "Fun!",
+            "opensPopover": false,
+            "href": "/projects",
+            "opensDrawer": false
+        },
+        {
+            "name": "About",
+            "opensPopover": false,
+            "href": "/about",
+            "opensDrawer": false
+        }
+    ]
+}

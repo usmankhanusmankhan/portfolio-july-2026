@@ -1,0 +1,31 @@
+.list-item {
+    padding: 8px 10px;
+    color: var(--color-text-link);
+}
+
+.list-item-selected {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--color-bg-list);
+    color: var(--color-text);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.list-item-selected-bullet {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--color-text);
+}
+
+.list-item:hover {
+    background: var(--color-bg-list);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
