@@ -427,15 +427,13 @@ export default function ProjectsPage() {
 
     const order = [
       { href: "./art11.webp", id: "art11" },
+      { href: "./art8.webp", id: "art8" },
       { href: "./art2.webp", id: "art2" },
       { href: "./art3.webp", id: "art3" },
-      { href: "./art4.webp", id: "art4" },
       { href: "./art5.webp", id: "art5" },
-      { href: "./art8.webp", id: "art8" },
       { href: "./art1.webp", id: "art1" },
       { href: "./art7.webp", id: "art7" },
       { href: "./art9.webp", id: "art9" },
-      { href: "./art10.webp", id: "art10" },
     ];
 
     // Start the line just to the right of the cover image, vertically
