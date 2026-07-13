@@ -37,13 +37,6 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
 
     const { setSelectedProject } = useProject();
 
-    const getPopoverContent = (linkName: string) => {
-        switch (linkName) {
-            default:
-                return null;
-        }
-    }
-
     return (
         <>
         <nav className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}>
