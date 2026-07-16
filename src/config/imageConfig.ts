@@ -12,6 +12,13 @@ export interface ImageConfig {
 }
 
 export const imageConfig: Record<string, ImageConfig> = {
+  "business-development-digest.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 500, height: 500 }),
+      tablet: (viewport) => ({ width: 425, height: 425 }),
+      mobile: (viewport) => ({ width: 300, height: 300 })
+    }
+  },
   "fungrainy.webp": {
     dimensions: {
       desktop: (viewport) => ({ width: 700, height: 500 }),

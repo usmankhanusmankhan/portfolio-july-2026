@@ -2,8 +2,9 @@ import * as React from "react";
 import { useNavigate, useBlocker } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
-import { useBreakpoint } from '../hooks/useBreakpoint';
-import { imageConfig } from '../config/imageConfig';
+import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
+import { imageConfig, ImageConfig } from '../config/imageConfig';
+import { professionalProjects, artProjects } from '../config/projectContent';
 import artContent from '../config/artContent.json';
 
 interface Point {
@@ -137,6 +138,44 @@ const PROJECTS_EXIT_DURATION = 0.15;
 const PROJECTS_EXIT_BLUR = 'blur(5px)';
 const PROJECTS_EXIT_IMAGE_FILTER = 'blur(5px)';
 const PROJECTS_FILTER_NONE = 'blur(0px)';
+
+const ROW_GAP = 64; // vertical spacing between rows
+const IMAGE_GAP = 64; // horizontal spacing between images within a row
+const DEFAULT_IMAGE_DIMENSIONS = { width: 500, height: 500 };
+
+type Viewport = { x: number; y: number };
+
+// Lays out a list of images left-to-right starting at (startX, topY).
+// Returns the positioned images plus the row's height (tallest image in
+// the row), so the caller can stack another row underneath it.
+function layoutRow(
+  entries: { href: string; id: string; link?: string; hoverText?: string }[],
+  imageConfigMap: Map<string, ImageConfig>,
+  breakpoint: Breakpoint,
+  viewport: Viewport,
+  startX: number,
+  topY: number
+) {
+  let cursorX = startX;
+  let rowHeight = 0;
+
+  const items = entries.map(({ href, id, link, hoverText }) => {
+    const fileName = href.replace('./', '');
+    const config = imageConfigMap.get(fileName);
+    const dimensions = config
+      ? config.dimensions[breakpoint](viewport)
+      : DEFAULT_IMAGE_DIMENSIONS;
+
+    const x = cursorX;
+    const y = topY;
+    cursorX += dimensions.width + IMAGE_GAP;
+    rowHeight = Math.max(rowHeight, dimensions.height);
+
+    return { href, id, link, hoverText, ...dimensions, x, y };
+  });
+
+  return { items, rowHeight };
+}
 
 export default function ProjectsPage() {
   const navigate = useNavigate();
@@ -422,41 +461,43 @@ export default function ProjectsPage() {
   }, [center.x, center.y, breakpoint, initialViewport, imageConfigMap]);
 
   const images = React.useMemo(() => {
-    const GAP = 96; // horizontal spacing between images
-    const DEFAULT_DIMENSIONS = { width: 500, height: 500 };
+    // Row 1: professional projects, starting right after the cover image,
+    // top-aligned with it.
+    const rowStartX = usmanIntro.x + usmanIntro.width + IMAGE_GAP;
+    const professionalRow = layoutRow(
+      professionalProjects,
+      imageConfigMap,
+      breakpoint,
+      initialViewport,
+      rowStartX,
+      usmanIntro.y
+    );
 
-    const order = [
-      { href: "./art11.webp", id: "art11" },
-      { href: "./art8.webp", id: "art8" },
-      { href: "./art2.webp", id: "art2" },
-      { href: "./art3.webp", id: "art3" },
-      { href: "./art5.webp", id: "art5" },
-      { href: "./art1.webp", id: "art1" },
-      { href: "./art7.webp", id: "art7" },
-      { href: "./art9.webp", id: "art9" },
-    ];
+    // Row 2: digital art, starting 96px below row 1 (below the tallest
+    // image in that row), same horizontal start and gap.
+    const artRow = layoutRow(
+      artProjects,
+      imageConfigMap,
+      breakpoint,
+      initialViewport,
+      rowStartX,
+      usmanIntro.y + professionalRow.rowHeight + ROW_GAP
+    );
 
-    // Start the line just to the right of the cover image, vertically
-    // centered on the cover. Each image advances the cursor by its own
-    // width + GAP, so reordering/resizing entries in `order` or in
-    // imageConfig.ts just works -- no position math to update by hand.
-    let cursorX = usmanIntro.x + usmanIntro.width + GAP;
-    const centerY = usmanIntro.y + usmanIntro.height / 2;
-
-    return order.map(({ href, id }) => {
-      const fileName = href.replace('./', '');
-      const config = imageConfigMap.get(fileName);
-      const dimensions = config
-        ? config.dimensions[breakpoint](initialViewport)
-        : DEFAULT_DIMENSIONS;
-
-      const x = cursorX;
-      const y = centerY - dimensions.height / 2;
-      cursorX += dimensions.width + GAP;
-
-      return { href, id, ...dimensions, x, y };
-    });
+    return [...professionalRow.items, ...artRow.items];
   }, [usmanIntro, breakpoint, initialViewport, imageConfigMap]);
+
+  // Text shown in the hover pill: per-image hoverText takes priority,
+  // then artContent.json's title for that id, then the raw id.
+  const hoveredPillText = React.useMemo(() => {
+    if (!hoveredImage) return '';
+    const hoveredEntry = images.find((img) => img.id === hoveredImage);
+    return (
+      hoveredEntry?.hoverText ??
+      (artContent as Record<string, { title?: string }>)[hoveredImage]?.title ??
+      hoveredImage
+    );
+  }, [hoveredImage, images]);
 
 
 
@@ -644,7 +685,7 @@ export default function ProjectsPage() {
                 }}
                 onMouseLeave={() => setHoveredImage(null)}
                 onMouseMove={(e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY })}
-                onClick={() => navigate(`/art/${img.id}`)}
+                onClick={() => navigate(img.link ?? `/art/${img.id}`)}
               />
             );
           })}
@@ -685,7 +726,7 @@ export default function ProjectsPage() {
               }}
               aria-hidden
             >
-              {(artContent as Record<string, { title?: string }>)[hoveredImage]?.title ?? hoveredImage}
+              {hoveredPillText}
             </span>
             <div
               style={{
@@ -718,12 +759,12 @@ export default function ProjectsPage() {
                 animate={{ x: ['-50%', '0%'] }}
                 transition={{
                   repeat: Infinity,
-                  duration: pillTitleWidth > 0 ? PILL_MARQUEE_PX_PER_SEC : 12,
+                  duration: pillTitleWidth > 0 ? pillTitleWidth : 12,
                   ease: 'linear',
                 }}
               >
-                <span style={{ flex: '0 0 50%' }}>{(artContent as Record<string, { title?: string }>)[hoveredImage]?.title ?? hoveredImage}</span>
-                <span style={{ flex: '0 0 50%' }}>{(artContent as Record<string, { title?: string }>)[hoveredImage]?.title ?? hoveredImage}</span>
+                <span style={{ flex: '0 0 50%' }}>{hoveredPillText}</span>
+                <span style={{ flex: '0 0 50%' }}>{hoveredPillText}</span>
               </motion.div>
             </div>
           </motion.div>
