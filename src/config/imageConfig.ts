@@ -12,7 +12,28 @@ export interface ImageConfig {
 }
 
 export const imageConfig: Record<string, ImageConfig> = {
+  "usmans-reading-journal.webm": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 500, height: 500 }),
+      tablet: (viewport) => ({ width: 425, height: 425 }),
+      mobile: (viewport) => ({ width: 300, height: 300 })
+    }
+  },
   "business-development-digest.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 500, height: 500 }),
+      tablet: (viewport) => ({ width: 425, height: 425 }),
+      mobile: (viewport) => ({ width: 300, height: 300 })
+    }
+  },
+  "ai-patterns.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 500, height: 500 }),
+      tablet: (viewport) => ({ width: 425, height: 425 }),
+      mobile: (viewport) => ({ width: 300, height: 300 })
+    }
+  },
+  "embedded-celeste.webp": {
     dimensions: {
       desktop: (viewport) => ({ width: 500, height: 500 }),
       tablet: (viewport) => ({ width: 425, height: 425 }),

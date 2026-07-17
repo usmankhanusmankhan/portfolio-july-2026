@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
 import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
 import { imageConfig, ImageConfig } from '../config/imageConfig';
-import { professionalProjects, artProjects } from '../config/projectContent';
+import { professionalProjects, artProjects, experimentalProjects } from '../config/projectContent';
 import artContent from '../config/artContent.json';
 
 interface Point {
@@ -139,8 +139,8 @@ const PROJECTS_EXIT_BLUR = 'blur(5px)';
 const PROJECTS_EXIT_IMAGE_FILTER = 'blur(5px)';
 const PROJECTS_FILTER_NONE = 'blur(0px)';
 
-const ROW_GAP = 64; // vertical spacing between rows
-const IMAGE_GAP = 64; // horizontal spacing between images within a row
+const ROW_GAP = 96; // vertical spacing between rows
+const IMAGE_GAP = 96; // horizontal spacing between images within a row
 const DEFAULT_IMAGE_DIMENSIONS = { width: 500, height: 500 };
 
 type Viewport = { x: number; y: number };
@@ -149,7 +149,7 @@ type Viewport = { x: number; y: number };
 // Returns the positioned images plus the row's height (tallest image in
 // the row), so the caller can stack another row underneath it.
 function layoutRow(
-  entries: { href: string; id: string; link?: string; hoverText?: string }[],
+  entries: { href: string; id: string; link?: string; hoverText?: string; mediaType?: 'image' | 'video' }[],
   imageConfigMap: Map<string, ImageConfig>,
   breakpoint: Breakpoint,
   viewport: Viewport,
@@ -159,7 +159,7 @@ function layoutRow(
   let cursorX = startX;
   let rowHeight = 0;
 
-  const items = entries.map(({ href, id, link, hoverText }) => {
+  const items = entries.map(({ href, id, link, hoverText, mediaType }) => {
     const fileName = href.replace('./', '');
     const config = imageConfigMap.get(fileName);
     const dimensions = config
@@ -171,7 +171,7 @@ function layoutRow(
     cursorX += dimensions.width + IMAGE_GAP;
     rowHeight = Math.max(rowHeight, dimensions.height);
 
-    return { href, id, link, hoverText, ...dimensions, x, y };
+    return { href, id, link, hoverText, mediaType: mediaType ?? 'image', ...dimensions, x, y };
   });
 
   return { items, rowHeight };
@@ -473,6 +473,15 @@ export default function ProjectsPage() {
       usmanIntro.y
     );
 
+    const experimentalRow = layoutRow(
+      experimentalProjects,
+      imageConfigMap,
+      breakpoint,
+      initialViewport,
+      rowStartX,
+      usmanIntro.y + professionalRow.rowHeight + ROW_GAP
+    );
+
     // Row 2: digital art, starting 96px below row 1 (below the tallest
     // image in that row), same horizontal start and gap.
     const artRow = layoutRow(
@@ -481,10 +490,10 @@ export default function ProjectsPage() {
       breakpoint,
       initialViewport,
       rowStartX,
-      usmanIntro.y + professionalRow.rowHeight + ROW_GAP
+      usmanIntro.y + professionalRow.rowHeight + experimentalRow.rowHeight + ROW_GAP + ROW_GAP
     );
 
-    return [...professionalRow.items, ...artRow.items];
+    return [...professionalRow.items, ...experimentalRow.items, ...artRow.items];
   }, [usmanIntro, breakpoint, initialViewport, imageConfigMap]);
 
   // Text shown in the hover pill: per-image hoverText takes priority,
@@ -626,6 +635,85 @@ export default function ProjectsPage() {
           {visibleImages.map((img, index) => {
             // Stagger the fade-in: each image gets a slight delay based on its index
             const fadeInDelay = index * 0.05; // 50ms between each image
+
+            const animateState = isExiting
+              ? {
+                  opacity: 0,
+                  scale: 1,
+                  filter: capabilities.prefersReducedMotion ? 'brightness(1)' : PROJECTS_EXIT_IMAGE_FILTER,
+                }
+              : artworkMounted
+                ? {
+                    opacity: hoveredImage === img.id ? 0.9 : 1,
+                    scale: 1,
+                    filter: hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
+                  }
+                : {
+                    opacity: 0,
+                    scale: 0.85,
+                    filter: 'brightness(1)',
+                  };
+
+            const transitionState = capabilities.prefersReducedMotion
+              ? { duration: 0 }
+              : isExiting
+                ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
+                : {
+                    opacity: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 20 },
+                    scale: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 20 },
+                    filter: { duration: 0.15, ease: 'easeInOut' },
+                  };
+
+            const sharedHandlers = {
+              onMouseEnter: (e: React.MouseEvent) => {
+                setHoveredImage(img.id);
+                setCursorPos({ x: e.clientX, y: e.clientY });
+              },
+              onMouseLeave: () => setHoveredImage(null),
+              onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
+              onClick: () => {
+                if (img.link && /^https?:\/\//.test(img.link)) {
+                  window.open(img.link, '_blank', 'noopener,noreferrer');
+                } else {
+                  navigate(img.link ?? `/art/${img.id}`);
+                }
+              },
+            };
+
+            if (img.mediaType === 'video') {
+              // Videos can't render via SVG <image>, so embed real HTML
+              // through <foreignObject>, which inherits the same
+              // coordinate system and pan/zoom transform as the canvas.
+              return (
+                <foreignObject
+                  key={img.id}
+                  x={img.x}
+                  y={img.y}
+                  width={img.width || 700}
+                  height={img.height || 700}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <motion.video
+                    src={img.href}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
+                    animate={animateState}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      display: 'block',
+                    }}
+                    {...sharedHandlers}
+                  />
+                </foreignObject>
+              );
+            }
+
             return (
               <motion.image
                 width={img.width || 700}
@@ -636,56 +724,11 @@ export default function ProjectsPage() {
                 x={img.x}
                 y={img.y}
                 initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
-                animate={
-                  isExiting
-                    ? {
-                        opacity: 0,
-                        scale: 1,
-                        filter: capabilities.prefersReducedMotion ? 'brightness(1)' : PROJECTS_EXIT_IMAGE_FILTER,
-                      }
-                    : artworkMounted
-                      ? {
-                          opacity: hoveredImage === img.id ? 0.9 : 1,
-                          scale: 1,
-                          filter: hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
-                        }
-                      : {
-                          opacity: 0,
-                          scale: 0.85,
-                          filter: 'brightness(1)',
-                        }
-                }
-                transition={
-                  capabilities.prefersReducedMotion
-                    ? { duration: 0 }
-                    : isExiting
-                      ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-                      : {
-                          opacity: {
-                            delay: fadeInDelay,
-                            type: 'spring',
-                            stiffness: 100,
-                            damping: 20,
-                          },
-                          scale: {
-                            delay: fadeInDelay,
-                            type: 'spring',
-                            stiffness: 100,
-                            damping: 20,
-                          },
-                          filter: { duration: 0.15, ease: 'easeInOut' },
-                        }
-                }
+                animate={animateState}
                 style={{
                   cursor: 'pointer',
                 }}
-                onMouseEnter={(e: React.MouseEvent) => {
-                  setHoveredImage(img.id);
-                  setCursorPos({ x: e.clientX, y: e.clientY });
-                }}
-                onMouseLeave={() => setHoveredImage(null)}
-                onMouseMove={(e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY })}
-                onClick={() => navigate(img.link ?? `/art/${img.id}`)}
+                {...sharedHandlers}
               />
             );
           })}

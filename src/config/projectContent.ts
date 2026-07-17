@@ -12,6 +12,9 @@ export interface ProjectImageEntry {
   // Optional text shown in the hover pill. If omitted, the gallery falls
   // back to artContent.json's title for that id, then the raw id.
   hoverText?: string;
+  // 'video' renders href as a looping muted <video> clip instead of a
+  // static image. Defaults to 'image' if omitted.
+  mediaType?: 'image' | 'video';
 }
 
 export const professionalProjects: ProjectImageEntry[] = [
@@ -20,15 +23,16 @@ export const professionalProjects: ProjectImageEntry[] = [
   { href: "./embedded-celeste.webp", id: "embedded-celeste", link: "/reachoutpanel", hoverText: "here we go!!!" },
 ];
 
+export const experimentalProjects: ProjectImageEntry[] = [
+  { href: "./usmans-reading-journal.webm", id: "usmans-reading-journal", link: "https://usmankhanusmankhan.github.io/reading-journal/", hoverText: "reading journal", mediaType: "video" },
+];
+
 export const artProjects: ProjectImageEntry[] = [
-  { href: "./art11.webp", id: "art11" },
+  { href: "./art1.webp", id: "art1" },
   { href: "./art2.webp", id: "art2" },
-  { href: "./art3.webp", id: "art3" },
-  { href: "./art4.webp", id: "art4" },
   { href: "./art5.webp", id: "art5" },
   { href: "./art8.webp", id: "art8" },
-  { href: "./art1.webp", id: "art1" },
+  { href: "./art11.webp", id: "art11" },
   { href: "./art7.webp", id: "art7" },
   { href: "./art9.webp", id: "art9" },
-  { href: "./art10.webp", id: "art10" },
 ];
