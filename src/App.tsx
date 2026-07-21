@@ -10,6 +10,7 @@ import ReachOutPanel from "./pages/ReachOutPanel";
 import ArtDetail from "./pages/ArtDetail";
 import About from "./pages/About";
 import ScrollToTop from "./components/ScrollToTop";
+import BusinessDevelopmentDigest from "./pages/BusinessDevelopmentDigest";
 
 function RootLayout() {
   return (
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <ProjectsPage /> },
       { path: "/reachoutpanel", element: <ReachOutPanel /> },
+      { path: "/businessdevelopmentdigest", element: <BusinessDevelopmentDigest />},
       { path: "/art/:id", element: <ArtDetail /> },
       { path: "/about", element: <About /> },
     ],

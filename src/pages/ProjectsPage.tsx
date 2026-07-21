@@ -853,7 +853,7 @@ export default function ProjectsPage() {
             -
           </button>
         </div>
-        <div>{Math.floor(camera.z * 100)}%</div>
+        <div style={{}}>{Math.floor(camera.z * 100)}%</div>
       </motion.div>
     </div>
   );
