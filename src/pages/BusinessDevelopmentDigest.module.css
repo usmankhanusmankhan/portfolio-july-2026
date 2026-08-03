@@ -1,23 +1,116 @@
+* {
+    font-family: AspektaVF;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 @media (min-width: 768px) {
     .casestudy {
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-direction: column;
+        margin: 0 auto;
+        max-width: 700px;
+        width: 100%;
         padding-top: 96px;
     }
 }
 
-.title {
-    font-family: AspektaVF;
+.title_hero {
     font-weight: 500;
     font-size: 20px;
     line-height: 28px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
 }
 
-.body {
-    font-family: AspektaVF;
+.title_main {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 32px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+.body_hero {
     font-weight: 350;
     font-size: 16px;
     line-height: 24px;
+    width: 100%;
+    text-align: center;
+    max-width: 75%;
+    margin: 0 auto;
+}
+
+.body_main {
+    font-weight: 350;
+    font-size: 16px;
+    line-height: 26px;
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.body_role {
+    font-weight: 350;
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 4px;
+}
+
+.hero_image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+.roles_and_timelines {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 48px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid #E1EED3;
+}
+
+.info_card {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #E1EED3;
+    background-color: #E1EED3;
+    width: 100%;
+}
+
+.card_row {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.card_row_pain_point {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.card_body {
+    font-weight: 350;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.case_study_video {
+    margin-top: 24px;
+    margin-bottom: 32px;
+    width: 100%;
+    height: auto;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 12px rgba(1, 56, 0, 0.1);
+}
+
+.video_container {
+    background-color: #E1EED3;
+    border-radius: 16px;
+    height: 500px;
+    display: grid;
+    place-items: center;
 }

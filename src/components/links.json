@@ -9,7 +9,13 @@
         {
             "name": "Contact",
             "opensPopover": false,
-            "href": "/contact",
+            "href": "mailto:hello@usman-khan.com",
+            "opensDrawer": false
+        },
+        {
+            "name": "Resume",
+            "opensPopover": false,
+            "href": "/resume.pdf",
             "opensDrawer": false
         }
     ]

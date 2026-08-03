@@ -18,7 +18,7 @@ export interface ProjectImageEntry {
 }
 
 export const professionalProjects: ProjectImageEntry[] = [
-  { href: "./business-development-digest.webp", id: "business-development-digest", link: "/businessdevelopmentdigest", hoverText: "here we go!!!" },
+  { href: "./business-development-digest.webp", id: "business-development-digest", link: "/bddigest", hoverText: "here we go!!!" },
   { href: "./ai-patterns.webp", id: "ai-patterns", link: "/reachoutpanel", hoverText: "here we go!!!" },
   { href: "./embedded-celeste.webp", id: "embedded-celeste", link: "/reachoutpanel", hoverText: "here we go!!!" },
 ];

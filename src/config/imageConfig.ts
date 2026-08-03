@@ -42,15 +42,15 @@ export const imageConfig: Record<string, ImageConfig> = {
   },
   "fungrainy.webp": {
     dimensions: {
-      desktop: (viewport) => ({ width: 700, height: 500 }),
-      tablet: (viewport) => ({ width: 500, height: 357 }),
+      desktop: (viewport) => ({ width: 800, height: 500 }),
+      tablet: (viewport) => ({ width: 500, height: 425 }),
       mobile: (viewport) => ({ width: 350, height: 250 })
     }
   },
   "art11.webp": {
     dimensions: {
       desktop: (viewport) => ({ width: 850, height: 500 }),
-      tablet: (viewport) => ({ width: 600, height: 353 }),
+      tablet: (viewport) => ({ width: 600, height: 425 }),
       mobile: (viewport) => ({ width: 400, height: 235 })
     }
   },
@@ -99,7 +99,7 @@ export const imageConfig: Record<string, ImageConfig> = {
   "art8.webp": {
     dimensions: {
       desktop: (viewport) => ({ width: 850, height: 500 }),
-      tablet: (viewport) => ({ width: 600, height: 353 }),
+      tablet: (viewport) => ({ width: 600, height: 425 }),
       mobile: (viewport) => ({ width: 400, height: 235 })
     }
   },
@@ -115,13 +115,6 @@ export const imageConfig: Record<string, ImageConfig> = {
       desktop: (viewport) => ({ width: 500, height: 500 }),
       tablet: (viewport) => ({ width: 425, height: 425 }),
       mobile: (viewport) => ({ width: 300, height: 300 })
-    }
-  },
-  "fun!.jpeg": {
-    dimensions: {
-      desktop: (viewport) => ({ width: 700, height: 700 }),
-      tablet: (viewport) => ({ width: 500, height: 500 }),
-      mobile: (viewport) => ({ width: 350, height: 350 })
     }
   },
 };

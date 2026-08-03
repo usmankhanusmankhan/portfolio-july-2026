@@ -27,7 +27,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <ProjectsPage /> },
       { path: "/reachoutpanel", element: <ReachOutPanel /> },
-      { path: "/businessdevelopmentdigest", element: <BusinessDevelopmentDigest />},
+      { path: "/bddigest", element: <BusinessDevelopmentDigest />},
       { path: "/art/:id", element: <ArtDetail /> },
       { path: "/about", element: <About /> },
     ],

@@ -54,24 +54,19 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
                     <img src="/logo.svg" alt="logo" height="32px" width="32px" style={{ display: 'block' }}/>
                 </button>
             </div>
-            <div className={styles['menu-container']}>
-                {linksArray.map((link: Link) => (
+            {linksArray.map((link: Link) => (
                     <div key={link.href} className={styles['link']}>
-                        {link.name === 'Fun!' || link.opensPopover ? (
-                            <button
-                                onClick={(e) => handleLinkClick(e, link)}
-                                className={styles['link-button']}
-                            >
+                        {link.name === 'RESUME' ? (
+                            <a href={link.href} target="_blank" rel="noopener noreferrer">
                                 {link.name}
-                            </button>
+                            </a>
                         ) : (
-                        <a href={link.href}>
-                            {link.name}
-                        </a>
+                            <a href={link.href}>
+                                {link.name}
+                            </a>
                         )}
                     </div>
                 ))}
-            </div>
         </nav>
     </>
     );
