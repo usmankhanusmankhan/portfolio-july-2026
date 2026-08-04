@@ -18,9 +18,11 @@ type LinksData = {
 
 type BottomMenuProps = {
     fixed?: boolean;
+    viewMode?: 'canvas' | 'list';
+    onViewModeChange?: (mode: 'canvas' | 'list') => void;
 };
 
-const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
+const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewModeChange }) => {
     const navigate = useNavigate();
     const linksData = links as LinksData;
     const linksArray = linksData.links;
@@ -42,7 +44,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
         <>
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
-            initial={{ y: -44}}
+            initial={{ y: -48}}
             whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>
@@ -73,6 +75,21 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
                         )}
                     </div>
                 ))}
+            {viewMode && onViewModeChange && (
+                <div className={styles['view-switcher']} role="tablist" aria-label="Project view">
+                    {(['canvas', 'list'] as const).map((mode) => (
+                        <button
+                            key={mode}
+                            className={styles['view-switcher-button']}
+                            role="tab"
+                            aria-selected={viewMode === mode}
+                            onClick={() => onViewModeChange(mode)}
+                        >
+                            {mode === 'canvas' ? 'Canvas' : 'List'}
+                        </button>
+                    ))}
+                </div>
+            )}
         </motion.nav>
     </>
     );

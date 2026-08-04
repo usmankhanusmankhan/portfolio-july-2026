@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, useBlocker } from 'react-router-dom';
+import { useNavigate, useBlocker, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
 import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
@@ -177,6 +177,48 @@ function layoutRow(
   return { items, rowHeight };
 }
 
+type ListImage = {
+  id: string;
+  href: string;
+  link?: string;
+  hoverText?: string;
+  mediaType?: 'image' | 'video';
+  section: 'Professional' | 'Experimental' | 'Art';
+};
+
+function ProjectsListView({
+  images,
+  onSelect,
+}: {
+  images: ListImage[];
+  onSelect: (img: ListImage) => void;
+}) {
+  // Blank canvas — build the list layout here.
+  // `images` is already flattened and tagged with `section`
+  // ('Professional' | 'Experimental' | 'Art'), and each item carries
+  // href / hoverText / mediaType('image'|'video') / link.
+  // Call `onSelect(img)` on click to reuse the same navigate-or-open-link
+  // behavior the canvas view uses.
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 10,
+        color: 'var(--color-text)',
+        padding: '96px 48px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ fontSize: 32, fontWeight: 500 }}>Hello World</div>
+    </motion.div>
+  );
+}
+
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const ref = React.useRef<SVGSVGElement>(null);
@@ -186,6 +228,42 @@ export default function ProjectsPage() {
   const [isMounted, setIsMounted] = React.useState(false);
   const [artworkMounted, setArtworkMounted] = React.useState(false);
   const [isExiting, setIsExiting] = React.useState(false);
+  // viewMode lives in the URL (?view=list) rather than local state, so a
+  // link can be shared with either default baked in. No param = 'canvas'.
+  const [urlParams, setUrlParams] = useSearchParams();
+  const viewMode: 'canvas' | 'list' = urlParams.get('view') === 'list' ? 'list' : 'canvas';
+  const setViewMode = React.useCallback(
+    (mode: 'canvas' | 'list') => {
+      setUrlParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (mode === 'list') {
+            next.set('view', 'list');
+          } else {
+            next.delete('view'); // keep the default (canvas) URL clean
+          }
+          return next;
+        },
+        { replace: true } // don't spam browser history on every toggle
+      );
+    },
+    [setUrlParams]
+  );
+
+  // Reset the camera whenever the user switches back to canvas from list,
+  // so it always lands the way it looked on first load rather than wherever
+  // it was left before the user navigated away. This fires directly off the
+  // switch action itself, not off a URL change, so it doesn't depend on the
+  // URL actually differing before/after.
+  const handleViewModeChange = React.useCallback(
+    (mode: 'canvas' | 'list') => {
+      if (mode === 'canvas' && viewMode === 'list') {
+        setCamera(DEFAULT_CAMERA);
+      }
+      setViewMode(mode);
+    },
+    [viewMode, setViewMode]
+  );
 
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
@@ -261,7 +339,7 @@ export default function ProjectsPage() {
 
   // Touch event support for mobile
   React.useEffect(() => {
-    if (!capabilities.isMobile) return;
+    if (!capabilities.isMobile || viewMode !== 'canvas') return;
 
     let touchStart: { x: number; y: number } | null = null;
     let lastTouch: { x: number; y: number } | null = null;
@@ -325,7 +403,7 @@ export default function ProjectsPage() {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [capabilities.isMobile, camera.z]);
+  }, [capabilities.isMobile, camera.z, viewMode]);
 
   // Coalesce wheel events into a single camera update per animation frame.
   // Accumulating deltas (instead of time-throttling and dropping events) keeps
@@ -362,6 +440,8 @@ export default function ProjectsPage() {
     }
 
     function handleWheel(event: WheelEvent) {
+      if (viewMode !== 'canvas') return;
+
       if (capabilities.prefersReducedMotion) {
         event.preventDefault();
         return;
@@ -388,11 +468,12 @@ export default function ProjectsPage() {
       window.removeEventListener("wheel", handleWheel);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [capabilities.prefersReducedMotion]);
+  }, [capabilities.prefersReducedMotion, viewMode]);
 
   // Fixed dependency array
   React.useEffect(() => {
     function handleArrowKeys(event: KeyboardEvent) {
+      if (viewMode !== 'canvas') return;
       if (event.key === "ArrowRight") {
         setCamera((camera) => panCamera(camera, 50, 0));
       } else if (event.key === "ArrowLeft") {
@@ -405,6 +486,7 @@ export default function ProjectsPage() {
     }
 
     function handleZoomKeys(event: KeyboardEvent) {
+      if (viewMode !== 'canvas') return;
       if (event.key === "+" || event.key === "=") {
         setCamera((camera) => zoomIn(camera, center));
       } else if (event.key === "-" || event.key === "_") {
@@ -419,9 +501,20 @@ export default function ProjectsPage() {
       window.removeEventListener("keydown", handleArrowKeys);
       window.removeEventListener("keydown", handleZoomKeys);
     };
-  }, []);
+  }, [viewMode, center]);
 
   
+  const handleProjectSelect = React.useCallback(
+    (img: { id: string; link?: string }) => {
+      if (img.link && /^https?:\/\//.test(img.link)) {
+        window.open(img.link, '_blank', 'noopener,noreferrer');
+      } else {
+        navigate(img.link ?? `/art/${img.id}`);
+      }
+    },
+    [navigate]
+  );
+
   const [hoveredImage, setHoveredImage] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (isExiting) setHoveredImage(null);
@@ -493,7 +586,11 @@ export default function ProjectsPage() {
       usmanIntro.y + professionalRow.rowHeight + experimentalRow.rowHeight + ROW_GAP + ROW_GAP
     );
 
-    return [...professionalRow.items, ...experimentalRow.items, ...artRow.items];
+    return [
+      ...professionalRow.items.map((item) => ({ ...item, section: 'Professional' as const })),
+      ...experimentalRow.items.map((item) => ({ ...item, section: 'Experimental' as const })),
+      ...artRow.items.map((item) => ({ ...item, section: 'Art' as const })),
+    ];
   }, [usmanIntro, breakpoint, initialViewport, imageConfigMap]);
 
   // Text shown in the hover pill: per-image hoverText takes priority,
@@ -537,8 +634,15 @@ export default function ProjectsPage() {
   const gridSize = 12000;
 
   return (
-    <div style={{ overflow: 'hidden', width: '100vw', height: '100vh' }}>
-      <BottomMenu />
+    <div style={{ overflow: 'hidden', width: '100vw', height: '100vh', position: 'relative' }}>
+      <BottomMenu viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+      <AnimatePresence mode="wait">
+        {viewMode === 'list' && (
+          <ProjectsListView key="list" images={images} onSelect={handleProjectSelect} />
+        )}
+      </AnimatePresence>
+      {viewMode === 'canvas' && (
+      <>
       <svg
         ref={ref}
         style={{
@@ -671,13 +775,7 @@ export default function ProjectsPage() {
               },
               onMouseLeave: () => setHoveredImage(null),
               onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
-              onClick: () => {
-                if (img.link && /^https?:\/\//.test(img.link)) {
-                  window.open(img.link, '_blank', 'noopener,noreferrer');
-                } else {
-                  navigate(img.link ?? `/art/${img.id}`);
-                }
-              },
+              onClick: () => handleProjectSelect(img),
             };
 
             if (img.mediaType === 'video') {
@@ -844,6 +942,8 @@ export default function ProjectsPage() {
         </div>
         <div style={{}}>{Math.floor(camera.z * 100)}%</div>
       </motion.div>
+      </>
+      )}
     </div>
   );
 }
