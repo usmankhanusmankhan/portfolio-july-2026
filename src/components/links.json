@@ -1,12 +1,6 @@
 {
     "links": [
         {
-            "name": "About",
-            "opensPopover": false,
-            "href": "/about",
-            "opensDrawer": false
-        },
-        {
             "name": "Contact",
             "opensPopover": false,
             "href": "mailto:hello@usman-khan.com",

@@ -4,6 +4,13 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 @media (min-width: 768px) {
@@ -13,6 +20,13 @@ html {
         width: 100%;
         padding-top: 96px;
     }
+}
+
+.nav_link {
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--color-text);
+    
 }
 
 .title_hero {

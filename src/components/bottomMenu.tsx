@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './bottomMenu.module.css';
 import links from './links.json';
 import { useProject } from '../contexts/ProjectContext';
+import { motion } from 'framer-motion';
 
 type Link = {
     name: string;
@@ -39,7 +40,12 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
 
     return (
         <>
-        <nav className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}>
+        <motion.nav 
+            className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
+            initial={{ y: -44}}
+            whileInView={{ y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>
             <div className={styles['logo-container']}>
                 <button
                     onClick={() => navigate('/')}
@@ -67,7 +73,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true }) => {
                         )}
                     </div>
                 ))}
-        </nav>
+        </motion.nav>
     </>
     );
 };

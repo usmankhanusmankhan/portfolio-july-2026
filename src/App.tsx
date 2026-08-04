@@ -30,6 +30,7 @@ const router = createBrowserRouter([
       { path: "/bddigest", element: <BusinessDevelopmentDigest />},
       { path: "/art/:id", element: <ArtDetail /> },
       { path: "/about", element: <About /> },
+
     ],
   },
 ]);

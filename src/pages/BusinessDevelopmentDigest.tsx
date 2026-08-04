@@ -1,5 +1,6 @@
 import styles from "./BusinessDevelopmentDigest.module.css";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function BusinessDevelopmentDigest() {
     const navigate = useNavigate();
@@ -8,7 +9,7 @@ export default function BusinessDevelopmentDigest() {
             <div style={{position: "fixed", top: "48px", left: "48px", zIndex: 1000}}>
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/')}
                     title="Back"
                     style={{
                         border: 'none',
@@ -20,6 +21,8 @@ export default function BusinessDevelopmentDigest() {
                         color: 'var(--color-text)',
                         fontFamily: 'AspektaVF',
                         background: 'none',
+                        marginBottom: '12px',
+                        fontSize: '14px',
                     }}
                 >
                     Back
@@ -31,17 +34,37 @@ export default function BusinessDevelopmentDigest() {
                         style={{ display: 'block' }}
                     />
                 </button>
+                <div 
+                    style={{display: 'flex', flexDirection: 'column', gap: '6px'}}
+                >
+                    <a className={styles.nav_link} href="#overview">Overview</a>
+                    <a className={styles.nav_link} href="#solution">Solution</a>
+                    <a className={styles.nav_link} href="#pain-points">Pain points</a>
+                    <a className={styles.nav_link} href="#prototyping">Prototyping</a>
+                    <a className={styles.nav_link} href="#feature-set">Feature set</a>
+                </div>
+
             </div>
             <div className={styles.casestudy}>
                 <div style={{marginBottom: "40px"}}>
-                    <h1 className={styles.title_hero}>
+                    <h1 
+                        className={styles.title_hero}
+                    >
                         Business development digest
                     </h1>
-                    <p className={styles.body_hero}>
+                    <p
+                        className={styles.body_hero}
+                    >
                         Redefining how lawyers action business development opportunities through Intapp's agentic platform, Celeste
                     </p>
                 </div>
-                <img className= {styles.hero_image} style={{marginBottom: "16px"}} src="./digest-hero.webp"></img>
+                <img
+                    className= {styles.hero_image} 
+                    style={{marginBottom: "16px"}} 
+                    src="./digest-hero.webp"
+                    loading="lazy"
+                >
+                </img>
                 <div className={styles.card_row} style={{marginBottom: "40px"}}>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Impact</p>

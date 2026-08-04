@@ -815,20 +815,9 @@ export default function ProjectsPage() {
       </AnimatePresence>
       <motion.div
         className="zoom-box"
-        initial={false}
-        animate={{
-          opacity: isExiting ? 0 : 1,
-          filter: isExiting
-            ? capabilities.prefersReducedMotion
-              ? PROJECTS_FILTER_NONE
-              : PROJECTS_EXIT_BLUR
-            : PROJECTS_FILTER_NONE,
-        }}
-        transition={
-          capabilities.prefersReducedMotion
-            ? { duration: 0 }
-            : { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-        }
+        initial={{opacity: 0, scale: 0.95, filter: "blur(6px)"}}
+        whileInView={{opacity: 1, scale: 1, filter: "blur(0px)"}}
+        transition={{duration: 0.4, delay: 1.2}}
       >
         <div style={{ marginBottom: 8 }}>
           <button
