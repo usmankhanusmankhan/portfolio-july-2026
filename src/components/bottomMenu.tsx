@@ -44,7 +44,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
         <>
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
-            initial={{ y: -48}}
+            initial={{ y: -48 }}
             whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>

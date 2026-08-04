@@ -186,6 +186,17 @@ type ListImage = {
   section: 'Professional' | 'Experimental' | 'Art';
 };
 
+/**
+ * Runs once on first mount of the list view after a page load; returning to
+ * it later within the same SPA session (canvas -> list -> canvas -> list)
+ * skips the cascade and shows the content already visible, same pattern as
+ * Home's header intro.
+ */
+let projectsListIntroCompletedThisLoad = false;
+
+const PROJECTS_LIST_HEADLINE =
+  "Usman Khan uses code and design to turn complex enterprise problems into software anyone can use";
+
 function ProjectsListView({
   images,
   onSelect,
@@ -193,12 +204,42 @@ function ProjectsListView({
   images: ListImage[];
   onSelect: (img: ListImage) => void;
 }) {
-  // Blank canvas — build the list layout here.
-  // `images` is already flattened and tagged with `section`
-  // ('Professional' | 'Experimental' | 'Art'), and each item carries
-  // href / hoverText / mediaType('image'|'video') / link.
-  // Call `onSelect(img)` on click to reuse the same navigate-or-open-link
-  // behavior the canvas view uses.
+  // NOTE: `images`/`onSelect` aren't wired into this markup yet — the cards
+  // below are the ones ported over verbatim. Swap them out for a map over
+  // `images` (grouped by `section`) with `onClick={() => onSelect(img)}`
+  // whenever you're ready to drive this from real project data.
+  const navigate = useNavigate();
+  const isFirstHeaderVisit = React.useMemo(() => !projectsListIntroCompletedThisLoad, []);
+  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+  const [headerAnimationDone, setHeaderAnimationDone] = React.useState(
+    () => projectsListIntroCompletedThisLoad
+  );
+  const [projectsTab, setProjectsTab] = React.useState<'selected' | 'experiments'>('selected');
+  const [hoverTab, setHoverTab] = React.useState<'selected' | 'experiments' | null>(null);
+  const [hoverAvidReader, setHoverAvidReader] = React.useState(false);
+  const tabBorderLength = 214;
+
+  // One-time intro cascade: headline, then subhead, then tabs, then cards,
+  // each via its own transition delay below. This just flips a flag shortly
+  // after mount so those per-element animate targets change.
+  React.useEffect(() => {
+    if (!isFirstHeaderVisit) return;
+    const tHeaderDone = setTimeout(() => {
+      setHeaderAnimationDone(true);
+      projectsListIntroCompletedThisLoad = true;
+    }, 50);
+    return () => clearTimeout(tHeaderDone);
+  }, [isFirstHeaderVisit]);
+
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive horizontal padding
+  const padding = windowWidth < 768 ? 16 : windowWidth < 1024 ? 48 : 96;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -208,13 +249,342 @@ function ProjectsListView({
       style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 10,
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
         color: 'var(--color-text)',
-        padding: '96px 48px',
-        boxSizing: 'border-box',
       }}
     >
-      <div style={{ fontSize: 32, fontWeight: 500 }}>Hello World</div>
+      <div
+        style={{
+          paddingLeft: padding,
+          paddingRight: padding,
+          paddingTop: 164, // clears the fixed navbar; see bottomMenu.module.css
+          boxSizing: 'border-box',
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            maxWidth: 600,
+            margin: '0 auto',
+            marginBottom: 96,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 32,
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <motion.div
+              initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
+              animate={{
+                opacity: headerAnimationDone ? 1 : 0,
+                y: headerAnimationDone ? 0 : -8,
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+              }}
+              transition={{ duration: 0.5, delay: 0.1, ease: 'easeInOut' }}
+            >
+              <h1
+                style={{
+                  boxSizing: 'border-box',
+                  color: 'var(--color-text)',
+                  fontFamily: 'AspektaVF',
+                  fontSize: '20px',
+                  fontWeight: '500',
+                  height: 'fit-content',
+                  lineHeight: '30px',
+                  textAlign: 'left',
+                  margin: 0,
+                }}
+              >
+                {PROJECTS_LIST_HEADLINE}
+              </h1>
+            </motion.div>
+            
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <motion.div
+              initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
+              animate={{
+                opacity: headerAnimationDone ? 1 : 0,
+                y: headerAnimationDone ? 0 : -8,
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+              }}
+              transition={{ duration: 0.5, delay: 0.45, ease: 'easeInOut' }}
+              style={{ display: 'flex', gap: 0, alignItems: 'center' }}
+            >
+              <button
+                type="button"
+                onClick={() => setProjectsTab('selected')}
+                onMouseEnter={() => setHoverTab('selected')}
+                onMouseLeave={() => setHoverTab(null)}
+                style={{
+                  position: 'relative',
+                  padding: '6px 12px',
+                  margin: 0,
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  fontFamily: '"AspektaVF", sans-serif',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: 'var(--color-text)',
+                }}
+              >
+                <svg
+                  style={{
+                    position: 'absolute',
+                    inset: '2px 4px',
+                    width: 'calc(100% - 8px)',
+                    height: 'calc(100% - 4px)',
+                    pointerEvents: 'none',
+                    overflow: 'visible',
+                    zIndex: 0,
+                    opacity: projectsTab === 'selected' || hoverTab === 'selected' ? 1 : 0,
+                    transition: 'opacity 0.3s ease',
+                  }}
+                  viewBox="0 0 100 36"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <defs>
+                    <filter id="tab-glow-list" x="-100%" y="-100%" width="400%" height="400%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur" />
+                      <feFlood floodColor="oklch(0.5 0.13 145)" floodOpacity="0.4" result="glowColor" />
+                      <feComposite in="glowColor" in2="blur" operator="in" result="softGlow" />
+                      <feMerge>
+                        <feMergeNode in="softGlow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <ellipse
+                    cx="50"
+                    cy="18"
+                    rx="48"
+                    ry="16"
+                    fill="var(--color-bg-list)"
+                    opacity={0.95}
+                    filter="url(#tab-glow-list)"
+                  />
+                  <path
+                    d="M 50 2 A 48 16 0 0 1 98 18 A 48 16 0 0 1 50 34 A 48 16 0 0 1 2 18 A 48 16 0 0 1 50 2"
+                    fill="none"
+                    stroke="var(--color-text)"
+                    strokeWidth="1.5"
+                    pathLength={tabBorderLength}
+                    strokeDasharray={tabBorderLength}
+                    style={{
+                      opacity: projectsTab === 'selected' ? 1 : 0,
+                      strokeDashoffset: projectsTab === 'selected' ? 0 : tabBorderLength,
+                      transition:
+                        projectsTab === 'selected'
+                          ? 'opacity 0.3s ease, stroke-dashoffset 0.5s ease'
+                          : 'opacity 0.3s ease',
+                    }}
+                  />
+                </svg>
+                <span style={{ position: 'relative', zIndex: 1, fontWeight: 400 }}>Selected</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setProjectsTab('experiments')}
+                onMouseEnter={() => setHoverTab('experiments')}
+                onMouseLeave={() => setHoverTab(null)}
+                style={{
+                  position: 'relative',
+                  padding: '6px 14px',
+                  margin: 0,
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  fontFamily: '"AspektaVF", sans-serif',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: 'var(--color-text)',
+                }}
+              >
+                <svg
+                  style={{
+                    position: 'absolute',
+                    inset: '2px 4px',
+                    width: 'calc(100% - 8px)',
+                    height: 'calc(100% - 4px)',
+                    pointerEvents: 'none',
+                    overflow: 'visible',
+                    zIndex: 0,
+                    opacity: projectsTab === 'experiments' || hoverTab === 'experiments' ? 1 : 0,
+                    transition: 'opacity 0.3s ease',
+                  }}
+                  viewBox="0 0 100 36"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
+                  <defs>
+                    <filter id="tab-glow-exp-list" x="-100%" y="-100%" width="400%" height="400%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur" />
+                      <feFlood floodColor="oklch(0.5 0.13 145)" floodOpacity="0.4" result="glowColor" />
+                      <feComposite in="glowColor" in2="blur" operator="in" result="softGlow" />
+                      <feMerge>
+                        <feMergeNode in="softGlow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <ellipse
+                    cx="50"
+                    cy="18"
+                    rx="48"
+                    ry="16"
+                    fill="var(--color-bg-list)"
+                    opacity={0.95}
+                    filter="url(#tab-glow-exp-list)"
+                  />
+                  <path
+                    d="M 50 2 A 48 16 0 0 1 98 18 A 48 16 0 0 1 50 34 A 48 16 0 0 1 2 18 A 48 16 0 0 1 50 2"
+                    fill="none"
+                    stroke="var(--color-text)"
+                    strokeWidth="1.5"
+                    pathLength={tabBorderLength}
+                    strokeDasharray={tabBorderLength}
+                    style={{
+                      opacity: projectsTab === 'experiments' ? 1 : 0,
+                      strokeDashoffset: projectsTab === 'experiments' ? 0 : tabBorderLength,
+                      transition:
+                        projectsTab === 'experiments'
+                          ? 'opacity 0.3s ease, stroke-dashoffset 0.5s ease'
+                          : 'opacity 0.3s ease',
+                    }}
+                  />
+                </svg>
+                <span style={{ position: 'relative', zIndex: 1, fontWeight: 400 }}>Experiments</span>
+              </button>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
+              animate={{
+                opacity: headerAnimationDone ? 1 : 0,
+                y: headerAnimationDone ? 0 : -8,
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+              }}
+              transition={{ duration: 0.5, delay: 0.55, ease: 'easeInOut' }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 24,
+                width: '100%',
+                position: 'relative',
+                minHeight: 200,
+              }}
+              className="cards-grid cards-grid-single"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {projectsTab === 'selected' && (
+                  <motion.div
+                    key="selected"
+                    initial={{ opacity: 0, filter: 'blur(5px)' }}
+                    animate={{ opacity: 1, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, filter: 'blur(5px)' }}
+                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
+                  >
+                    <div className="card" onClick={() => navigate('/reachoutpanel')}>
+                      <div className="card-image card-image-medium">
+                        <img
+                          src="./reachoutpanel.webp"
+                          alt="Activator playbook"
+                          loading="lazy"
+                          decoding="async"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                        />
+                      </div>
+                      <div className="card-content">
+                        <div className="card-title">Business development playbook</div>
+                        <div className="card-description">
+                          Redefining how lawyers action business development opportunities through Intapp's
+                          agentic platform, Celeste
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card" onClick={() => navigate('/signals-card-redesign')}>
+                      <div className="card-image card-image-medium">
+                        <img
+                          src="./reachoutpanel.webp"
+                          alt="Reach out panel"
+                          loading="lazy"
+                          decoding="async"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                        />
+                      </div>
+                      <div className="card-content">
+                        <div className="card-title">Intapp's visual patterns for AI</div>
+                        <div className="card-description">
+                          Audited and refreshed the visual identity of AI branding within Intapp's products.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card" onClick={() => navigate('/ibm-quantum')}>
+                      <div className="card-image card-image-medium">
+                        <img
+                          src="./reachoutpanel.webp"
+                          alt="Reach out panel"
+                          loading="lazy"
+                          decoding="async"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                        />
+                      </div>
+                      <div className="card-content">
+                        <div className="card-title">Embedded Celeste</div>
+                        <div className="card-description">
+                          Led design for integrating agentic capabilities in Intapp's flagship product, Dealcloud.
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                {projectsTab === 'experiments' && (
+                  <motion.div
+                    key="experiments"
+                    initial={{ opacity: 0, filter: 'blur(5px)' }}
+                    animate={{ opacity: 1, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, filter: 'blur(5px)' }}
+                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%' }}
+                  >
+                    <div
+                      className="card"
+                      onClick={() =>
+                        window.open(
+                          'https://usmankhanusmankhan.github.io/reading-journal/',
+                          '_blank',
+                          'noopener,noreferrer'
+                        )
+                      }
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="card-image card-image-large">
+                        <img
+                          src="./reading-journal.webp"
+                          alt="Usman's reading journal"
+                          loading="lazy"
+                          decoding="async"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                        />
+                      </div>
+                      <div className="card-content">
+                        <div className="card-title">Reading journal</div>
+                        <div className="card-description">
+                          My thoughts on everything I've read this year, using Matter.js
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }
