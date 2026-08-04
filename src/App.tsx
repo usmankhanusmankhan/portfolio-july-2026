@@ -6,7 +6,6 @@ import {
   Outlet,
 } from "react-router-dom";
 import ProjectsPage from "./pages/ProjectsPage";
-import ReachOutPanel from "./pages/ReachOutPanel";
 import ArtDetail from "./pages/ArtDetail";
 import About from "./pages/About";
 import ScrollToTop from "./components/ScrollToTop";
@@ -26,7 +25,6 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: "/", element: <ProjectsPage /> },
-      { path: "/reachoutpanel", element: <ReachOutPanel /> },
       { path: "/bddigest", element: <BusinessDevelopmentDigest />},
       { path: "/art/:id", element: <ArtDetail /> },
       { path: "/about", element: <About /> },

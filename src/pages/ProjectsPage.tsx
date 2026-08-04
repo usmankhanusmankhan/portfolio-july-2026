@@ -216,7 +216,6 @@ function ProjectsListView({
   );
   const [projectsTab, setProjectsTab] = React.useState<'selected' | 'experiments'>('selected');
   const [hoverTab, setHoverTab] = React.useState<'selected' | 'experiments' | null>(null);
-  const [hoverAvidReader, setHoverAvidReader] = React.useState(false);
   const tabBorderLength = 214;
 
   // One-time intro cascade: headline, then subhead, then tabs, then cards,
@@ -488,10 +487,10 @@ function ProjectsListView({
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
                   >
-                    <div className="card" onClick={() => navigate('/reachoutpanel')}>
+                    <div className="card" onClick={() => navigate('/bddigest')}>
                       <div className="card-image card-image-medium">
                         <img
-                          src="./reachoutpanel.webp"
+                          src="./bd-digest-list.webp"
                           alt="Activator playbook"
                           loading="lazy"
                           decoding="async"
@@ -509,7 +508,7 @@ function ProjectsListView({
                     <div className="card" onClick={() => navigate('/signals-card-redesign')}>
                       <div className="card-image card-image-medium">
                         <img
-                          src="./reachoutpanel.webp"
+                          src="./ai-patterns-list.webp"
                           alt="Reach out panel"
                           loading="lazy"
                           decoding="async"
@@ -526,7 +525,7 @@ function ProjectsListView({
                     <div className="card" onClick={() => navigate('/ibm-quantum')}>
                       <div className="card-image card-image-medium">
                         <img
-                          src="./reachoutpanel.webp"
+                          src="./embedded-celeste-list.webp"
                           alt="Reach out panel"
                           loading="lazy"
                           decoding="async"
@@ -582,6 +581,23 @@ function ProjectsListView({
                 )}
               </AnimatePresence>
             </motion.div>
+          </div>
+          <div style={{paddingTop: '64px'}}>
+            <h1 style={{fontSize: '20px', fontWeight: 500, lineHeight: '30px', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
+                  <img src='./art1.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
+                  <p style={{color: "#333"}}>on play and its opposing pressures</p>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
+                  <img src='./art2.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
+                  <p style={{color: "#333"}}>on defining the web</p>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
+                  <img src='./art5.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
+                  <p style={{color: "#333"}}>on inspiration</p>
+                </div>
+             </div> 
           </div>
         </div>
       </div>
@@ -893,7 +909,6 @@ export default function ProjectsPage() {
   const [pillTitleWidth, setPillTitleWidth] = React.useState(0);
   const pillRef = React.useRef<HTMLDivElement>(null);
 
-  const PILL_MARQUEE_PX_PER_SEC = 25;
   React.useLayoutEffect(() => {
     if (!hoveredImage) {
       setPillTitleWidth(0);
