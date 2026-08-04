@@ -174,17 +174,26 @@ function FungrainyCanvas({ width, height }: { width: number; height: number }) {
 
       p.setup = () => {
         const { width: w, height: h } = sizeRef.current;
+        let myFont = p.loadFont('./AspektaVF.ttf');
         p.createCanvas(w, h);
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.background(150, 150, 150);
-        p.text('Usman', w / 2, h / 2);
+        p.background(200, 200, 200);
+        p.textAlign(p.LEFT, p.TOP);
+        p.textSize(40);
+        p.textLeading(52);
+        p.textFont('AspektaVF');
+        p.text('Usman Khan uses design and code to turn complex enterprise problems into software anyone can use', 48, 48, 700);
       };
 
       p.draw = () => {
         const { width: w, height: h } = sizeRef.current;
-        p.fill(p.random(0, 250), p.random(0, 250), p.random(0, 250), 50);
-        p.ellipse(p.mouseX, p.mouseY, p.random(5, 25), p.random(5, 25));
       };
+
+      p.mouseDragged = () => {
+        p.fill(p.random(0, 250), p.random(0, 250), p.random(0, 250), 30);
+        p.noStroke();
+        p.ellipse(p.mouseX, p.mouseY, p.random(5, 25), p.random(5, 25));
+      }
     };
 
     const instance = new p5(sketch, containerRef.current);
