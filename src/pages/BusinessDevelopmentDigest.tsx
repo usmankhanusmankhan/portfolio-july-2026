@@ -55,7 +55,7 @@ export default function BusinessDevelopmentDigest() {
                     <p
                         className={styles.body_hero}
                     >
-                        Redefining how lawyers action business development opportunities through Intapp's agentic platform, Celeste
+                        Redefining how lawyers action business development opportunities by designing an agentic playbook
                     </p>
                 </div>
                 <img
@@ -100,18 +100,18 @@ export default function BusinessDevelopmentDigest() {
                 <div id="overview" style={{marginBottom: "112px"}}>
                     <div>
                         <h1 className={styles.title_main}>We were missing the mark on making business development opportunities for lawyers obvious, relevant, and immediately actionable</h1>
-                        <p className={styles.body_main}>Our business development offering... </p>
+                        <p className={styles.body_main}>For the past year, I had worked on Activator, a product designed to help lawyers supercharge their business development. However, we had low adoption rates due to difficulties hosting the solution on our CRM, Dealcloud. The introduction of our agentic platform, Celeste, changed the possibilities of how we delivered information to our customers.</p>
                     </div>
-                    <img src="./overview-bddigest.webp" style={{width: "100%", height: "auto"}}></img>
+                    <img src="./overview-bddigest.webp" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
                 <div id="solution" style={{marginBottom: "112px"}}>
-                    <h1 className={styles.title_main}>Through our agentic experience Celeste, we offer high impact BD opportunities without overwhelming the user or becoming noise</h1>
+                    <h1 className={styles.title_main}>I designed an agentic playbook to offer high impact BD opportunities without overwhelming the user or becoming noise</h1>
                     <video className={styles.case_study_video} autoPlay loop muted playsInline>
                         <source src="./activator-celeste-playbook.webm" type="video/webm" />
                     </video>
                 </div>
                 <div id="pain-points" style={{marginBottom: "112px"}}>
-                    <h1 className={styles.title_main}>Based on prior research, we knew that...</h1>
+                    <h1 className={styles.title_main}>Interviews revealed our current services were too information heavy with little context on why the information is important</h1>
                     <div className={styles.card_row}>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>
@@ -138,22 +138,22 @@ export default function BusinessDevelopmentDigest() {
                 </div>
                 <div style={{marginBottom: "80px"}}>
                     <h1 className={styles.title_main}>An intelligently guided conversation</h1>
-                    <p className={styles.body_main}>If a lawyer only had a few seconds of attention to think about their BD, what should they do? Through past research...</p>
+                    <p className={styles.body_main}>How else could we keep the lawyer's attention front and center, especially when we've learned about how time-sensitive their other work is? We intelligently refresh the conversation based on what opportunities they've already actioned so we can keep the lawyer in the moment, while taking the chance to provide positive reinforcement.</p>
                     <img src="./intelligently-guided.png" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
                 <div style={{marginBottom: "80px"}}>
                     <h1 className={styles.title_main}>Keeping the human in charge of communications</h1>
-                    <p className={styles.body_main}>If a lawyer only had a few seconds of attention to think about their BD, what should they do? Through past research...</p>
+                    <p className={styles.body_main}>The concept of "human-in-the-loop" was continuously referenced by our team and the broader design team. We knew through past research that lawyers felt inclined to have final control over their communication with colleagues. We do not send any messages automatically, or without approval.</p>
                     <img src="./human-in-charge.png" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
                 <div style={{marginBottom: "96px"}}>
                     <h1 className={styles.title_main}>Bulk actionability to save time</h1>
-                    <p className={styles.body_main}>If a lawyer only had a few seconds of attention to think about their BD, what should they do? Through past research...</p>
+                    <p className={styles.body_main}>In our previous system with low adoption rates, we were giving each lawyer every opportunity one-by-one. In a new agentic world, we could shorten the workflow by grouping together multiple actions while allowing the LLM to still give context on why the options were there.</p>
                     <img src="./bulk-actionability.webp" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
                 <div id="learnings" style={{marginBottom: "96px"}}>
                     <h1 className={styles.title_main}>If I were to do it again, I’d meet the lawyers where they live in Outlook</h1>
-                    <p className={styles.body_main}>Another tidbit of historical knowledge: we know that lawyers live in existing platforms like Outlook.We knew that placing the solution in our agentic platform would take them away from the famiilar workflow.  In the future, I would recreate the digest within Outlook to be easily actionable in theireveryday areas.</p>
+                    <p className={styles.body_main}>Another tidbit of historical knowledge: we know that lawyers live in existing platforms like Outlook. We knew that placing the solution in our agentic platform would take them away from the famiilar workflow.  In the future, I would recreate the digest within Outlook to be easily actionable in their everyday areas.</p>
                 </div>
             </div>
         </div>

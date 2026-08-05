@@ -139,7 +139,6 @@ const PROJECTS_EXIT_BLUR = 'blur(5px)';
 const PROJECTS_EXIT_IMAGE_FILTER = 'blur(5px)';
 const PROJECTS_FILTER_NONE = 'blur(0px)';
 
-const ROW_GAP = 96; // vertical spacing between rows
 const IMAGE_GAP = 96; // horizontal spacing between images within a row
 const DEFAULT_IMAGE_DIMENSIONS = { width: 500, height: 500 };
 
@@ -185,6 +184,133 @@ type ListImage = {
   mediaType?: 'image' | 'video';
   section: 'Professional' | 'Experimental' | 'Art';
 };
+
+type ProjectCategory = 'featured' | 'experiments' | 'writing';
+
+const CATEGORY_OPTIONS: { value: ProjectCategory; label: string }[] = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'experiments', label: 'Experiments' },
+  { value: 'writing', label: 'Writing' },
+];
+
+// Dropdown used in canvas mode to switch which single row of projects is
+// laid out on the canvas (replaces the old always-visible three-row stack).
+function CategoryDropdown({
+  value,
+  onChange,
+}: {
+  value: ProjectCategory;
+  onChange: (next: ProjectCategory) => void;
+}) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const selected = CATEGORY_OPTIONS.find((opt) => opt.value === value) ?? CATEGORY_OPTIONS[0];
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    function handlePointerDown(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsOpen(false);
+    }
+    window.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+        zIndex: 500,
+        fontFamily: '"AspektaVF", sans-serif',
+      }}
+    >
+      <motion.button
+        type="button"
+        initial={{ opacity: 0, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, filter: 'blur(0px)' }}
+        transition={{duration: 0.4, delay: 1.2}}
+        onClick={() => setIsOpen((open) => !open)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 14px',
+          margin: 0,
+          borderRadius: 9999,
+          border: '1px solid var(--color-stroke-muted)',
+          background: 'var(--color-bg-list)',
+          color: 'var(--color-text)',
+          fontFamily: 'inherit',
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px var(--color-modal-shadow)',
+        }}
+      >
+        <span>{selected.label}</span>
+      </motion.button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            role="listbox"
+            initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+            transition={{ duration: 0.15, ease: 'easeInOut' }}
+            style={{
+              listStyle: 'none',
+              margin: '8px 0 0',
+              padding: 6,
+              position: 'absolute',
+              bottom: 'calc(100% + 8px)',
+              right: 0,
+              minWidth: 180,
+              borderRadius: 16,
+              border: '1px solid var(--color-stroke-muted)',
+              background: 'var(--color-bg-list)',
+              boxShadow: '0 8px 24px var(--color-modal-shadow)',
+            }}
+          >
+            {CATEGORY_OPTIONS.map((opt) => (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={opt.value === value}
+                onClick={() => {
+                  onChange(opt.value);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: opt.value === value ? 500 : 400,
+                  color: 'var(--color-text)',
+                  background: opt.value === value ? 'var(--color-stroke-muted)' : 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {opt.label}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 /**
  * Runs once on first mount of the list view after a page load; returning to
@@ -651,6 +777,15 @@ export default function ProjectsPage() {
     [viewMode, setViewMode]
   );
 
+  // Which single row of projects is laid out on the canvas. Replaces the
+  // old fixed three-row stack (professional / experimental / art) with a
+  // dropdown-driven single row.
+  const [category, setCategory] = React.useState<ProjectCategory>('featured');
+  const handleCategoryChange = React.useCallback((next: ProjectCategory) => {
+    setCategory(next);
+    
+  }, []);
+
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       currentLocation.pathname === '/projects' &&
@@ -939,11 +1074,20 @@ export default function ProjectsPage() {
   }, [center.x, center.y, breakpoint, initialViewport, imageConfigMap]);
 
   const images = React.useMemo(() => {
-    // Row 1: professional projects, starting right after the cover image,
-    // top-aligned with it.
+    // Single row, starting right after the cover image, top-aligned with
+    // it. Which project list feeds the row depends on the dropdown.
     const rowStartX = usmanIntro.x + usmanIntro.width + IMAGE_GAP;
-    const professionalRow = layoutRow(
-      professionalProjects,
+    const activeProjects =
+      category === 'featured'
+        ? professionalProjects
+        : category === 'experiments'
+          ? experimentalProjects
+          : artProjects;
+    const section: ListImage['section'] =
+      category === 'featured' ? 'Professional' : category === 'experiments' ? 'Experimental' : 'Art';
+
+    const row = layoutRow(
+      activeProjects,
       imageConfigMap,
       breakpoint,
       initialViewport,
@@ -951,32 +1095,8 @@ export default function ProjectsPage() {
       usmanIntro.y
     );
 
-    const experimentalRow = layoutRow(
-      experimentalProjects,
-      imageConfigMap,
-      breakpoint,
-      initialViewport,
-      rowStartX,
-      usmanIntro.y + professionalRow.rowHeight + ROW_GAP
-    );
-
-    // Row 2: digital art, starting 96px below row 1 (below the tallest
-    // image in that row), same horizontal start and gap.
-    const artRow = layoutRow(
-      artProjects,
-      imageConfigMap,
-      breakpoint,
-      initialViewport,
-      rowStartX,
-      usmanIntro.y + professionalRow.rowHeight + experimentalRow.rowHeight + ROW_GAP + ROW_GAP
-    );
-
-    return [
-      ...professionalRow.items.map((item) => ({ ...item, section: 'Professional' as const })),
-      ...experimentalRow.items.map((item) => ({ ...item, section: 'Experimental' as const })),
-      ...artRow.items.map((item) => ({ ...item, section: 'Art' as const })),
-    ];
-  }, [usmanIntro, breakpoint, initialViewport, imageConfigMap]);
+    return row.items.map((item) => ({ ...item, section }));
+  }, [usmanIntro, breakpoint, initialViewport, imageConfigMap, category]);
 
   // Text shown in the hover pill: per-image hoverText takes priority,
   // then artContent.json's title for that id, then the raw id.
@@ -1028,6 +1148,7 @@ export default function ProjectsPage() {
       </AnimatePresence>
       {viewMode === 'canvas' && (
       <>
+      <CategoryDropdown value={category} onChange={handleCategoryChange} />
       <svg
         ref={ref}
         style={{

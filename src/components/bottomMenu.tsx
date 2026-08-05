@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './bottomMenu.module.css';
 import links from './links.json';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useProject } from '../contexts/ProjectContext';
+import { motion } from 'framer-motion';
 
 type Link = {
     name: string;
@@ -25,12 +26,25 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
     const navigate = useNavigate();
     const linksData = links as LinksData;
     const linksArray = linksData.links;
+    const [openPopover, setOpenPopover] = useState<string | null>(null);
+
+    const handleLinkClick = (e: React.MouseEvent, link: Link) => {
+        if (link.name === 'Fun!') {
+            // Navigate directly to projects page with "Art & writing" selected
+            setSelectedProject('Art & writing');
+            navigate('/projects');
+        } else if (link.opensPopover) {
+            setOpenPopover(openPopover === link.name ? null : link.name);
+        }
+    }
+
+    const { setSelectedProject } = useProject();
 
     return (
         <>
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
-            initial={{ y: -48 }}
+            initial={{ y: -50}}
             whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>
@@ -50,7 +64,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
             </div>
             {linksArray.map((link: Link) => (
                     <div key={link.href} className={styles['link']}>
-                        {link.name === 'Resume' ? (
+                        {link.name === 'RESUME' ? (
                             <a href={link.href} target="_blank" rel="noopener noreferrer">
                                 {link.name}
                             </a>
@@ -62,10 +76,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
                     </div>
                 ))}
             {viewMode && onViewModeChange && (
-                <div 
-                    className={styles['view-switcher']} 
-                    role="tablist" 
-                    aria-label="Project view">
+                <div className={styles['view-switcher']} role="tablist" aria-label="Project view">
                     {(['canvas', 'list'] as const).map((mode) => (
                         <button
                             key={mode}
