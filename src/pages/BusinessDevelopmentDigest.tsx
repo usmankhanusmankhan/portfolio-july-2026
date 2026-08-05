@@ -111,7 +111,8 @@ export default function BusinessDevelopmentDigest() {
                     </video>
                 </div>
                 <div id="pain-points" style={{marginBottom: "112px"}}>
-                    <h1 className={styles.title_main}>Interviews revealed our current services were too information heavy with little context on why the information is important</h1>
+                    <h1 className={styles.title_main}>Interviews revealed our current services were too information heavy with little context on why it's there</h1>
+                    <img src="./pain-point-interview.webp" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "12px", marginTop: "12px"}}></img>
                     <div className={styles.card_row}>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>

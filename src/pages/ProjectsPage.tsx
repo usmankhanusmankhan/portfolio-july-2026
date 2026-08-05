@@ -229,8 +229,8 @@ function CategoryDropdown({
       ref={containerRef}
       style={{
         position: 'fixed',
-        bottom: 16,
-        right: 16,
+        bottom: 12,
+        right: 12,
         zIndex: 500,
         fontFamily: '"AspektaVF", sans-serif',
       }}
