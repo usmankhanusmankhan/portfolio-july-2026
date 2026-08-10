@@ -104,8 +104,9 @@ html {
 .info_card {
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid #E1EED3;
-    background-color: #E1EED3;
+    background-color: var(--color-bg);
+    background-image: linear-gradient(to bottom, var(--color-bg), var(--color-bg-list));
+    border: 1px solid var(--color-border);
     width: 100%;
 }
 
