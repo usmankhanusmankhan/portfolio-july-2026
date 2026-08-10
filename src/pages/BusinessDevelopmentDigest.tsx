@@ -63,16 +63,6 @@ export default function BusinessDevelopmentDigest() {
                     loading="lazy"
                 >
                 </img>
-                <div className={styles.card_row} style={{marginBottom: "40px"}}>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Impact</p>
-                            <p className={styles.card_body}>Handoff time was cut to 1 week, instead of a longer, traditional handoff process</p>
-                        </div>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Impact</p>
-                            <p className={styles.card_body}>Wide-spread buy in from leadership team, reigniting a spark for a dying product line </p>
-                        </div>
-                </div>
                 <div className={styles.roles_and_timelines}>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Role</p>
@@ -81,18 +71,31 @@ export default function BusinessDevelopmentDigest() {
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Tools</p>
                         <p className={styles.body_role}>Figma</p>
-                        <p className={styles.body_role}>Claude</p>
                         <p className={styles.body_role}>Cursor</p>
+                        <p className={styles.body_role}>Claude</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Team</p>
-                        <p className={styles.body_role}>Product Designer</p>
+                        <p className={styles.body_role}>Myself</p>
                         <p className={styles.body_role}>Design Lead</p>
                         <p className={styles.body_role}>Product Lead</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Timeline</p>
                         <p className={styles.body_role}>1 week</p>
+                    </div>
+                </div>
+                <div style={{marginBottom: "80px", paddingBottom: "80px", borderBottom: "1px solid #E1EED3"}}>
+                    <h1 style={{marginBottom: "24px"}} className={styles.title_hero}>Here's how the work moved the needle</h1>
+                    <div className={styles.card_row}>
+                            <div className={styles.info_card}>
+                                <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Reduced handoff time by 50%</p>
+                                <p className={styles.card_body}>Handoff time was cut to 1 week, instead of usual time of 1 month</p>
+                            </div>
+                            <div className={styles.info_card}>
+                                <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>C-suite buy in</p>
+                                <p className={styles.card_body}>Wide-spread buy in from leadership team, reigniting a spark for a dying product line</p>
+                            </div>
                     </div>
                 </div>
                 <div id="overview" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
@@ -112,13 +115,13 @@ export default function BusinessDevelopmentDigest() {
                     <h1 className={styles.title_main}>Interviews revealed our current services were too information heavy with little context on why it's there</h1>
                     <img src="./pain-point-interview.webp" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "12px", marginTop: "12px"}}></img>
                     <div className={styles.card_row}>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>
-                            <p className={styles.card_body}>Users want to block out unnecessary noise, especially in a time-constrained role</p>
+                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Pain point</p>
+                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Users want to block out unnecessary noise, especially in a time-constrained role</p>
                         </div>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>
-                            <p className={styles.card_body}>Users need to understand context and why an opportunity actually applies to them</p>
+                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Pain point</p>
+                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Users need to understand context and why an opportunity actually applies to them</p>
                         </div>
                     </div>
                 </div>

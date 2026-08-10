@@ -19,12 +19,13 @@ export interface ProjectImageEntry {
   // no brightness/opacity hover state, and no click handler. Use for purely
   // decorative row images that aren't a link to a project.
   disableHover?: boolean;
+  pillOnly?: boolean;
 }
 
 export const professionalProjects: ProjectImageEntry[] = [
   { href: "./business-development-digest.webp", id: "business-development-digest", link: "/bddigest", hoverText: "here we go!!!" },
   { href: "./ai-patterns.webp", id: "ai-patterns", link: "/aipatterns", hoverText: "here we go!!!" },
-  { href: "./embedded-celeste.webp", id: "ibm-quantum", link: "/ibmquantum", hoverText: "here we go!!!" },
+  { href: "./embedded-celeste.webp", id: "ibm-quantum", link: "/ibmquantum", hoverText: "coming soon!!!", pillOnly: true},
   { href: "./kind-feedback.webp", id: "kind-feedback", disableHover: true },
 ];
 

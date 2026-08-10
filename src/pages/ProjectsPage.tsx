@@ -148,7 +148,7 @@ type Viewport = { x: number; y: number };
 // Returns the positioned images plus the row's height (tallest image in
 // the row), so the caller can stack another row underneath it.
 function layoutRow(
-  entries: { href: string; id: string; link?: string; hoverText?: string; mediaType?: 'image' | 'video'; disableHover?: boolean }[],
+  entries: { href: string; id: string; link?: string; hoverText?: string; mediaType?: 'image' | 'video'; disableHover?: boolean; pillOnly?: boolean }[],
   imageConfigMap: Map<string, ImageConfig>,
   breakpoint: Breakpoint,
   viewport: Viewport,
@@ -158,7 +158,7 @@ function layoutRow(
   let cursorX = startX;
   let rowHeight = 0;
 
-  const items = entries.map(({ href, id, link, hoverText, mediaType, disableHover }) => {
+  const items = entries.map(({ href, id, link, hoverText, mediaType, disableHover, pillOnly }) => {
     const fileName = href.replace('./', '');
     const config = imageConfigMap.get(fileName);
     const dimensions = config
@@ -170,7 +170,7 @@ function layoutRow(
     cursorX += dimensions.width + IMAGE_GAP;
     rowHeight = Math.max(rowHeight, dimensions.height);
 
-    return { href, id, link, hoverText, mediaType: mediaType ?? 'image', disableHover, ...dimensions, x, y };
+    return { href, id, link, hoverText, mediaType: mediaType ?? 'image', disableHover, pillOnly, ...dimensions, x, y };
   });
 
   return { items, rowHeight };
@@ -183,6 +183,7 @@ type ListImage = {
   hoverText?: string;
   mediaType?: 'image' | 'video';
   disableHover?: boolean;
+  pillOnly?: boolean;
   section: 'Professional' | 'Experimental' | 'Art';
 };
 
@@ -1393,9 +1394,9 @@ export default function ProjectsPage() {
                 }
               : artworkMounted
                 ? {
-                    opacity: !img.disableHover && hoveredImage === img.id ? 0.9 : 1,
+                    opacity: !img.disableHover && !img.pillOnly && hoveredImage === img.id ? 0.9 : 1,
                     scale: 1,
-                    filter: !img.disableHover && hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
+                    filter: !img.disableHover && !img.pillOnly && hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
                   }
                 : {
                     opacity: 0,
@@ -1434,17 +1435,29 @@ export default function ProjectsPage() {
             // Images flagged disableHover (e.g. the kind-feedback testimonials
             // shot) render like the fungrainy cover: no hover pill, no
             // brightness/opacity hover state, no click handler.
+            // Images flagged pillOnly (e.g. not-yet-launched projects) still
+            // show the hover pill for context, but keep the cursor and
+            // opacity unchanged and aren't clickable.
             const sharedHandlers = img.disableHover
               ? {}
-              : {
-                  onMouseEnter: (e: React.MouseEvent) => {
-                    setHoveredImage(img.id);
-                    setCursorPos({ x: e.clientX, y: e.clientY });
-                  },
-                  onMouseLeave: () => setHoveredImage(null),
-                  onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
-                  onClick: () => handleProjectSelect(img),
-                };
+              : img.pillOnly
+                ? {
+                    onMouseEnter: (e: React.MouseEvent) => {
+                      setHoveredImage(img.id);
+                      setCursorPos({ x: e.clientX, y: e.clientY });
+                    },
+                    onMouseLeave: () => setHoveredImage(null),
+                    onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
+                  }
+                : {
+                    onMouseEnter: (e: React.MouseEvent) => {
+                      setHoveredImage(img.id);
+                      setCursorPos({ x: e.clientX, y: e.clientY });
+                    },
+                    onMouseLeave: () => setHoveredImage(null),
+                    onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
+                    onClick: () => handleProjectSelect(img),
+                  };
 
             if (img.mediaType === 'video') {
               // Videos can't render via SVG <image>, so embed real HTML
@@ -1494,7 +1507,7 @@ export default function ProjectsPage() {
                 animate={animateState}
                 transition={transitionState}
                 style={{
-                  cursor: img.disableHover ? 'default' : 'pointer',
+                  cursor: img.disableHover || img.pillOnly ? 'default' : 'pointer',
                 }}
                 {...sharedHandlers}
               />
