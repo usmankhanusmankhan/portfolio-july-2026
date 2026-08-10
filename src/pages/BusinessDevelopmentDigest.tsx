@@ -60,7 +60,8 @@ export default function BusinessDevelopmentDigest() {
                     className= {styles.hero_image} 
                     style={{marginBottom: "16px"}} 
                     src="./digest-hero.webp"
-                    loading="lazy"
+                    fetchPriority="high"
+                    decoding="sync"
                 >
                 </img>
                 <div className={styles.roles_and_timelines}>

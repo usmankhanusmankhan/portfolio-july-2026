@@ -708,8 +708,8 @@ function ProjectsListView({
                         <img
                           src="./reading-journal.webp"
                           alt="Usman's reading journal"
-                          loading="lazy"
-                          decoding="async"
+                          fetchPriority="high"
+                          decoding="sync"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
                       </div>
@@ -1280,8 +1280,8 @@ export default function ProjectsPage() {
         <defs>
           <pattern
             id="projects-grid"
-            width={100}
-            height={100}
+            width={50}
+            height={50}
             patternUnits="userSpaceOnUse"
           >
             <path
@@ -1338,6 +1338,7 @@ export default function ProjectsPage() {
               width={usmanIntro.width}
               height={usmanIntro.height}
               preserveAspectRatio="xMidYMid meet"
+
               style={{ willChange: 'opacity, transform, filter' }}
               initial={{ opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }}
               animate={
