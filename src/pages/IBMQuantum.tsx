@@ -1,4 +1,4 @@
-import styles from "./BusinessDevelopmentDigest.module.css";
+import styles from "./IBMQuantum.module.css";
 import { useNavigate } from "react-router-dom";
 
 export default function BusinessDevelopmentDigest() {
@@ -36,8 +36,9 @@ export default function BusinessDevelopmentDigest() {
                 </div>
                 <div className={styles.jump_links}>
                     <a className={styles.nav_link} href="#overview">Overview</a>
+                    <a className={styles.nav_link} href="#problem">Problem</a>
                     <a className={styles.nav_link} href="#solution">Solution</a>
-                    <a className={styles.nav_link} href="#pain-points">Pain points</a>
+                    <a className={styles.nav_link} href="#initial-findings">Initial findings</a>
                     <a className={styles.nav_link} href="#prototyping">Prototyping</a>
                     <a className={styles.nav_link} href="#feature-set">Feature set</a>
                 </div>
@@ -48,12 +49,12 @@ export default function BusinessDevelopmentDigest() {
                     <h1 
                         className={styles.title_hero}
                     >
-                        Business development digest
+                        IBM Quantum metric tracking
                     </h1>
                     <p
                         className={styles.body_hero}
                     >
-                        Redefining how lawyers action business development opportunities by designing an agentic playbook
+                        Led design for dashboard tracking metrics for 50 IBM Quantum artifacts, saving months of implementation
                     </p>
                 </div>
                 <img
@@ -66,29 +67,27 @@ export default function BusinessDevelopmentDigest() {
                 <div className={styles.card_row} style={{marginBottom: "40px"}}>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Impact</p>
-                            <p className={styles.card_body}>Handoff time was cut to 1 week, instead of a longer, traditional handoff process</p>
+                            <p className={styles.card_body}>Implementation time was cut down from months to 20 minutes</p>
                         </div>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Impact</p>
-                            <p className={styles.card_body}>Wide-spread buy in from leadership team, reigniting a spark for a dying product line </p>
+                            <p className={styles.card_body}>Led to high internal usage rate to generate quarterly data reports</p>
                         </div>
                 </div>
                 <div className={styles.roles_and_timelines}>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Role</p>
-                        <p className={styles.body_role}>Product Designer</p>
+                        <p className={styles.body_role}>Visual / Product Designer</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Tools</p>
                         <p className={styles.body_role}>Figma</p>
-                        <p className={styles.body_role}>Claude</p>
-                        <p className={styles.body_role}>Cursor</p>
+                        <p className={styles.body_role}>Mural</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Team</p>
-                        <p className={styles.body_role}>Product Designer</p>
-                        <p className={styles.body_role}>Design Lead</p>
-                        <p className={styles.body_role}>Product Lead</p>
+                        <p className={styles.body_role}>2 Product Designers</p>
+                        <p className={styles.body_role}>UX Researcher</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Timeline</p>
@@ -97,37 +96,53 @@ export default function BusinessDevelopmentDigest() {
                 </div>
                 <div id="overview" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
                     <div>
-                        <h1 className={styles.title_main}>We were missing the mark on making business development opportunities for lawyers obvious, relevant, and immediately actionable</h1>
-                        <p className={styles.body_main}>For the past year, I had worked on Activator, a product designed to help lawyers supercharge their business development. However, we had low adoption rates due to difficulties hosting the solution on our CRM, Dealcloud. The introduction of our agentic platform, Celeste, changed the possibilities of how we delivered information to our customers.</p>
+                        <h1 className={styles.title_main}>Our team is a world leader in quantum computing and resources, and showcases tons of online material</h1>
+                        <p className={styles.body_main}>They have over 20 cloud-connected systems worldwide, including their iconic System One. Their flagship product, Qiskit Runtime, is their online quantum computing service and programming model for running quantum algorithms. Other than Qiskit Runtime, there are countless resources and way to learn about and experiment with IBM Quantum.</p>
                     </div>
-                    <img src="./overview-bddigest.webp" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
+                    <img src="./ibm-context.png" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
+                </div>
+                <div id="problem" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
+                    <div>
+                        <h1 className={styles.title_main}>With many different services and offerings, there was no centralized way to track them internally</h1>
+                        <p className={styles.body_main}>Because the Quantum team couldn't track them internally, they couldn't share out data with other stakeholders and find business value in their work. From this point on, our team referred to the online resources as "touchpoints". Our managers further defined touchpoints as any IBM Quantum website, offering, service, or product.</p>
+                    </div>
+                    <img src="./ibm-touchpoint.png" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
                 </div>
                 <div id="solution" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
-                    <h1 className={styles.title_main}>I designed an agentic playbook to offer high impact BD opportunities without overwhelming the user or becoming noise</h1>
+                    <h1 className={styles.title_main}>We designed a consolidated solution that gave </h1>
                     <video className={styles.case_study_video} autoPlay loop muted playsInline>
                         <source src="./activator-celeste-playbook.webm" type="video/webm" />
                     </video>
                 </div>
-                <div id="pain-points" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
-                    <h1 className={styles.title_main}>Interviews revealed our current services were too information heavy with little context on why it's there</h1>
-                    <img src="./pain-point-interview.webp" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "12px", marginTop: "12px"}}></img>
+                <div id="initial-findings" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
+                    <h1 className={styles.title_main}>We interviewed cross-team stakeholders to gain insight on how they prefer to analyze data.</h1>
+                    <p className={styles.body_main}>We conducted 5 interviews with a Product Manager, Data Scientist, Marketing Lead, Design Researcher, and Content Writer. They all consistently need to share out data from essential IBM Quantum touchpoints. So many touchpoints are tracked, which means that data isn't interpreted by just one team.  As a result, we needed to understand different definitions of what success looks like for our stakeholder's prioritized touchpoints.</p>
+                    <img src="./ibm-stakeholders.svg" style={{width: "100%", height: "auto", marginBottom: "12px", marginTop: "12px"}}></img>
+                </div>
+                <div style={{marginBottom: "clamp(40px, 10vw, 80px)"}}>
+                    <h1 className={styles.title_main}>Data is given without context and needs definition points</h1>
+                    <p className={styles.body_main}>All stakeholders mentioned at least one data point that they regularly analyze which was confusing to them. They have the problem of presenting data during share-outs without knowing their meaning.</p>
+                    <div className={styles.card_row}>
+                        
+                        <div className={styles.info_card}>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Opportunity</p>
+                            <p className={styles.card_body}>Provide context behind which research studies different data sets come from, and from what source or platform</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="key-insights" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
+                    <h1 className={styles.title_main}>Data is often gathered from multiple sources</h1>
+                    <p className={styles.body_main}>All stakeholders mentioned at least one data point that they regularly analyze which was confusing to them. They have the problem of presenting data during share-outs without knowing their meaning.</p>
                     <div className={styles.card_row}>
                         <div className={styles.info_card}>
                             <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>
                             <p className={styles.card_body}>Users want to block out unnecessary noise, especially in a time-constrained role</p>
                         </div>
                         <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Pain Point</p>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Opportunity</p>
                             <p className={styles.card_body}>Users need to understand context and why an opportunity actually applies to them</p>
                         </div>
                     </div>
-                </div>
-                <div id="prototyping" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
-                    <h1 className={styles.title_main}>Cursor and Claude allowed me to rapidly prototype interactions that got the team quickly excited</h1>
-                    <p className={styles.body_main}>Working closer to the code has not only helped dramatically cut down implementation time for devs, but also showcase animations and motion that communicate my vision to PMs and Devs a lot better than Figma. Typing interactions, like the one shown below, would have been much more time consuming to create in Figma.</p>
-                    <video className={styles.case_study_video} autoPlay loop muted playsInline>
-                        <source src="./claude-cursor-exciting.webm" type="video/webm"/>
-                    </video>
                 </div>
                 <div id="feature-set" style={{marginBottom: "clamp(40px, 10vw, 80px)"}}>
                     <p className={styles.body_main} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "clamp(12px, 4vw, 14px)"}}>Feature Set</p>

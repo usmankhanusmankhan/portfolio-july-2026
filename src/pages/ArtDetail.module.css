@@ -1,5 +1,12 @@
-.bottomMenuWrapper {
+.back_button {
+    border: none;
+    cursor: pointer;
     display: flex;
-    justify-content: center;
-    padding-top: 32px;
+    gap: 8px;
+    align-items: center;
+    color: var(--color-text);
+    font-family: AspektaVF;
+    position: fixed;
+    top: 48px;
+    left: 48px;
 }

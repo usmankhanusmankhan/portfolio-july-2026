@@ -10,6 +10,8 @@ import ArtDetail from "./pages/ArtDetail";
 import About from "./pages/About";
 import ScrollToTop from "./components/ScrollToTop";
 import BusinessDevelopmentDigest from "./pages/BusinessDevelopmentDigest";
+import AiPatterns from "./pages/AiPatterns";
+import IBMQuantum from "./pages/IBMQuantum"
 
 function RootLayout() {
   return (
@@ -26,6 +28,8 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <ProjectsPage /> },
       { path: "/bddigest", element: <BusinessDevelopmentDigest />},
+      { path: "/aipatterns", element: <AiPatterns /> },
+      { path: "/ibmquantum", element: <IBMQuantum />},
       { path: "/art/:id", element: <ArtDetail /> },
       { path: "/about", element: <About /> },
 

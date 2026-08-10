@@ -44,7 +44,22 @@ export const imageConfig: Record<string, ImageConfig> = {
     dimensions: {
       desktop: (viewport) => ({ width: 800, height: 500 }),
       tablet: (viewport) => ({ width: 500, height: 425 }),
-      mobile: (viewport) => ({ width: 350, height: 250 })
+      mobile: (viewport) => ({ width: 480, height: 300 })
+    }
+  },
+
+  "fungrainy2.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 800, height: 500 }),
+      tablet: (viewport) => ({ width: 500, height: 425 }),
+      mobile: (viewport) => ({ width: 480, height: 300 })
+    }
+  },
+  "fungrainy3.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 800, height: 500 }),
+      tablet: (viewport) => ({ width: 500, height: 425 }),
+      mobile: (viewport) => ({ width: 480, height: 300 })
     }
   },
   "art11.webp": {
@@ -115,6 +130,13 @@ export const imageConfig: Record<string, ImageConfig> = {
       desktop: (viewport) => ({ width: 500, height: 500 }),
       tablet: (viewport) => ({ width: 425, height: 425 }),
       mobile: (viewport) => ({ width: 300, height: 300 })
+    }
+  },
+  "kind-feedback.webp": {
+    dimensions: {
+      desktop: (viewport) => ({ width: 1312, height: 500 }),
+      tablet: (viewport) => ({ width: 735, height: 280 }),
+      mobile: (viewport) => ({ width: 420, height: 160 })
     }
   },
 };

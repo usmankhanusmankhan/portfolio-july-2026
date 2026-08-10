@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate, useBlocker, useSearchParams } from 'react-router-dom';
+import { useNavigate, useBlocker, useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
 import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
@@ -148,7 +148,7 @@ type Viewport = { x: number; y: number };
 // Returns the positioned images plus the row's height (tallest image in
 // the row), so the caller can stack another row underneath it.
 function layoutRow(
-  entries: { href: string; id: string; link?: string; hoverText?: string; mediaType?: 'image' | 'video' }[],
+  entries: { href: string; id: string; link?: string; hoverText?: string; mediaType?: 'image' | 'video'; disableHover?: boolean }[],
   imageConfigMap: Map<string, ImageConfig>,
   breakpoint: Breakpoint,
   viewport: Viewport,
@@ -158,7 +158,7 @@ function layoutRow(
   let cursorX = startX;
   let rowHeight = 0;
 
-  const items = entries.map(({ href, id, link, hoverText, mediaType }) => {
+  const items = entries.map(({ href, id, link, hoverText, mediaType, disableHover }) => {
     const fileName = href.replace('./', '');
     const config = imageConfigMap.get(fileName);
     const dimensions = config
@@ -170,7 +170,7 @@ function layoutRow(
     cursorX += dimensions.width + IMAGE_GAP;
     rowHeight = Math.max(rowHeight, dimensions.height);
 
-    return { href, id, link, hoverText, mediaType: mediaType ?? 'image', ...dimensions, x, y };
+    return { href, id, link, hoverText, mediaType: mediaType ?? 'image', disableHover, ...dimensions, x, y };
   });
 
   return { items, rowHeight };
@@ -182,6 +182,7 @@ type ListImage = {
   link?: string;
   hoverText?: string;
   mediaType?: 'image' | 'video';
+  disableHover?: boolean;
   section: 'Professional' | 'Experimental' | 'Art';
 };
 
@@ -321,7 +322,7 @@ function CategoryDropdown({
 let projectsListIntroCompletedThisLoad = false;
 
 const PROJECTS_LIST_HEADLINE =
-  "Usman Khan uses code and design to turn complex enterprise problems into software anyone can use";
+  "Hi, this is Usman! I use design and code to turn complex enterprise problems into enjoyable software that anyone can use.";
 
 function ProjectsListView({
   images,
@@ -383,7 +384,7 @@ function ProjectsListView({
         style={{
           paddingLeft: padding,
           paddingRight: padding,
-          paddingTop: 164, // clears the fixed navbar; see bottomMenu.module.css
+          paddingTop: 'clamp(96px, 10vw, 164px)', // clears the fixed navbar; see bottomMenu.module.css
           boxSizing: 'border-box',
         }}
       >
@@ -401,11 +402,11 @@ function ProjectsListView({
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <motion.div
-              initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
+              initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
               animate={{
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
-                filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
               }}
               transition={{ duration: 0.5, delay: 0.1, ease: 'easeInOut' }}
             >
@@ -414,10 +415,10 @@ function ProjectsListView({
                   boxSizing: 'border-box',
                   color: 'var(--color-text)',
                   fontFamily: 'AspektaVF',
-                  fontSize: '20px',
+                  fontSize: 'clamp(16px, 3.5vw, 20px)',
                   fontWeight: '500',
                   height: 'fit-content',
-                  lineHeight: '30px',
+                  lineHeight: 'clamp(26px, 2.5vw, 30px)',
                   textAlign: 'left',
                   margin: 0,
                 }}
@@ -425,15 +426,30 @@ function ProjectsListView({
                 {PROJECTS_LIST_HEADLINE}
               </h1>
             </motion.div>
-            
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <motion.div
-              initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
+            <motion.h2
+              initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
               animate={{
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
-                filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
+              }}
+              transition={{ duration: 0.5, delay: 0.3, ease: 'easeInOut' }}
+              style={{
+                  color: 'var(--color-text)',
+                  fontFamily: 'AspektaVF',
+                  fontSize: 'clamp(12px, 3.5vw, 16px)',
+                  fontWeight: '350',}}
+            >
+              With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
+            </motion.h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <motion.div
+              initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+              animate={{
+                opacity: headerAnimationDone ? 1 : 0,
+                y: headerAnimationDone ? 0 : -8,
+                filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
               }}
               transition={{ duration: 0.5, delay: 0.45, ease: 'easeInOut' }}
               style={{ display: 'flex', gap: 0, alignItems: 'center' }}
@@ -620,7 +636,7 @@ function ProjectsListView({
                           alt="Activator playbook"
                           loading="lazy"
                           decoding="async"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
                       </div>
                       <div className="card-content">
@@ -631,14 +647,14 @@ function ProjectsListView({
                         </div>
                       </div>
                     </div>
-                    <div className="card" onClick={() => navigate('/signals-card-redesign')}>
+                    <div className="card" onClick={() => navigate('/aipatterns')}>
                       <div className="card-image card-image-medium">
                         <img
                           src="./ai-patterns-list.webp"
-                          alt="Reach out panel"
+                          alt="AI patterns"
                           loading="lazy"
                           decoding="async"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
                       </div>
                       <div className="card-content">
@@ -648,14 +664,14 @@ function ProjectsListView({
                         </div>
                       </div>
                     </div>
-                    <div className="card" onClick={() => navigate('/ibm-quantum')}>
+                    <div className="card" onClick={() => navigate('/ibmquantum')}>
                       <div className="card-image card-image-medium">
                         <img
                           src="./embedded-celeste-list.webp"
                           alt="Reach out panel"
                           loading="lazy"
                           decoding="async"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
                       </div>
                       <div className="card-content">
@@ -693,7 +709,7 @@ function ProjectsListView({
                           alt="Usman's reading journal"
                           loading="lazy"
                           decoding="async"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
                       </div>
                       <div className="card-content">
@@ -709,9 +725,19 @@ function ProjectsListView({
             </motion.div>
           </div>
           <div style={{paddingTop: '64px'}}>
-            <h1 style={{fontSize: '20px', fontWeight: 500, lineHeight: '30px', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
+            <h1 style={{fontSize: 'clamp(16px, 3.5vw, 20px)', fontWeight: 500, lineHeight: 'clamp(26px, 3.5vw, 30px)', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
+                <div
+                  onClick={() => navigate('/art/art1')} 
+                  style={{
+                    display: 'flex', 
+                    flexDirection: 'row', 
+                    gap: '24px', 
+                    alignItems: 'center', 
+                    borderRadius: '16px', 
+                    border: '1px solid var(--color-border)', 
+                    padding: '8px',}}>
+                  
                   <img src='./art1.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
                   <p style={{color: "#333"}}>on play and its opposing pressures</p>
                 </div>
@@ -733,6 +759,7 @@ function ProjectsListView({
 
 export default function ProjectsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const ref = React.useRef<SVGSVGElement>(null);
   const [camera, setCamera] = React.useState(DEFAULT_CAMERA);
   const capabilities = React.useMemo(() => getDeviceCapabilities(), []);
@@ -740,27 +767,52 @@ export default function ProjectsPage() {
   const [isMounted, setIsMounted] = React.useState(false);
   const [artworkMounted, setArtworkMounted] = React.useState(false);
   const [isExiting, setIsExiting] = React.useState(false);
-  // viewMode lives in the URL (?view=list) rather than local state, so a
-  // link can be shared with either default baked in. No param = 'canvas'.
+
   const [urlParams, setUrlParams] = useSearchParams();
-  const viewMode: 'canvas' | 'list' = urlParams.get('view') === 'list' ? 'list' : 'canvas';
+
+  // viewMode defaults by breakpoint (list on mobile, canvas otherwise), but
+  // a shared link like /projects?view=list or /projects?view=canvas can
+  // override that on first load — read once here so those links still work.
+  // After that initial read, toggling via the bottom menu only updates
+  // local state; the ?view= param itself gets stripped from the URL below.
+  const breakpointDefaultViewMode: 'canvas' | 'list' = breakpoint === 'mobile' ? 'list' : 'canvas';
+  const [viewModeOverride, setViewModeOverride] = React.useState<'canvas' | 'list' | null>(() => {
+    const initialParam = urlParams.get('view');
+    return initialParam === 'list' || initialParam === 'canvas' ? initialParam : null;
+  });
+  const viewMode: 'canvas' | 'list' = viewModeOverride ?? breakpointDefaultViewMode;
   const setViewMode = React.useCallback(
     (mode: 'canvas' | 'list') => {
+      // Clear the override when the chosen mode matches the current
+      // breakpoint's default, so resizing across breakpoints later still
+      // follows the default again instead of getting stuck.
+      setViewModeOverride(mode === breakpointDefaultViewMode ? null : mode);
+    },
+    [breakpointDefaultViewMode]
+  );
+
+  // The ?view= / ?category= params (if present) have already been captured
+  // into state above; strip them from the URL now so the address bar
+  // simplifies back to a clean /projects and switching either control
+  // afterward never touches the URL again — the page should always feel
+  // like the same page to the user. Goes through the router's own
+  // setUrlParams (rather than raw window.history) so react-router's
+  // internal location state stays in sync with the address bar.
+  React.useEffect(() => {
+    if (urlParams.has('view') || urlParams.has('category')) {
       setUrlParams(
         (prev) => {
           const next = new URLSearchParams(prev);
-          if (mode === 'list') {
-            next.set('view', 'list');
-          } else {
-            next.delete('view'); // keep the default (canvas) URL clean
-          }
+          next.delete('view');
+          next.delete('category');
           return next;
         },
-        { replace: true } // don't spam browser history on every toggle
+        { replace: true }
       );
-    },
-    [setUrlParams]
-  );
+    }
+    // Run once on mount only — this is a one-time cleanup of the initial URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset the camera whenever the user switches back to canvas from list,
   // so it always lands the way it looked on first load rather than wherever
@@ -780,11 +832,39 @@ export default function ProjectsPage() {
   // Which single row of projects is laid out on the canvas. Replaces the
   // old fixed three-row stack (professional / experimental / art) with a
   // dropdown-driven single row.
-  const [category, setCategory] = React.useState<ProjectCategory>('featured');
-  const handleCategoryChange = React.useCallback((next: ProjectCategory) => {
-    setCategory(next);
-    
-  }, []);
+  //
+  // Category is persisted on THIS page's own history entry via
+  // navigate(..., { state }) rather than the URL, so the address bar never
+  // shows it (the page always feels like the same /projects). Browsers
+  // keep state attached to its history entry natively: navigating forward
+  // into a project pushes a new entry on top, and clicking the browser's
+  // Back button pops back to this entry — restoring its state, including
+  // category — without any code needing to run on the way there.
+  //
+  // A shared link like /projects?category=writing can still pick the
+  // starting category on first load (read once here as a fallback when
+  // there's no history state yet); after that, switching the dropdown only
+  // updates state and never writes to the URL.
+  const [categoryOverride, setCategoryOverride] = React.useState<ProjectCategory | null>(() => {
+    const stateCategory = (location.state as { category?: ProjectCategory } | null)?.category;
+    if (stateCategory === 'experiments' || stateCategory === 'writing') return stateCategory;
+    const initialParam = urlParams.get('category');
+    return initialParam === 'experiments' || initialParam === 'writing' ? initialParam : null;
+  });
+  const category: ProjectCategory = categoryOverride ?? 'featured';
+  const handleCategoryChange = React.useCallback(
+    (next: ProjectCategory) => {
+      setCategoryOverride(next === 'featured' ? null : next);
+      navigate(
+        { pathname: location.pathname, search: location.search },
+        {
+          replace: true,
+          state: { ...(location.state as object | null), category: next === 'featured' ? undefined : next },
+        }
+      );
+    },
+    [navigate, location.pathname, location.search, location.state]
+  );
 
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
@@ -813,14 +893,43 @@ export default function ProjectsPage() {
     height: window.innerHeight
   });
 
+  // Tracks whether the cover image has already played its one-time intro
+  // delay (0.3s, part of the page-load cascade: grid -> cover -> artwork).
+  // After that, category swaps should re-enter the cover in sync with the
+  // row images' cadence (no extra offset), not repeat the intro delay.
+  const coverHasEnteredRef = React.useRef(false);
+
+  // Preload every cover image variant once, up front, so switching category
+  // never has to wait on a first-time network fetch + decode mid-animation
+  // (that's what was causing the enter/exit lag on fungrainy2/3).
+  React.useEffect(() => {
+    const hrefs = ['./fungrainy.webp', './fungrainy2.webp', './fungrainy3.webp'];
+    const preloaded = hrefs.map((src) => {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
+    return () => {
+      preloaded.forEach((img) => {
+        img.src = '';
+      });
+    };
+  }, []);
+
   React.useEffect(() => {
     // Trigger mount animation: grid fades in first (no delay), then cover (0.3s), then artwork (0.85s)
     setIsMounted(true);
     const artworkTimer = setTimeout(() => {
       setArtworkMounted(true);
     }, 850);
-    
-    return () => clearTimeout(artworkTimer);
+    const coverEnteredTimer = setTimeout(() => {
+      coverHasEnteredRef.current = true;
+    }, 300);
+
+    return () => {
+      clearTimeout(artworkTimer);
+      clearTimeout(coverEnteredTimer);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -1058,20 +1167,29 @@ export default function ProjectsPage() {
     return new Map(Object.entries(imageConfig));
   }, []);
 
+  // Which cover image shows depends on the active category — same base
+  // artwork, three different overlaid taglines.
+  const coverHref = React.useMemo(() => {
+    if (category === 'experiments') return './fungrainy2.webp';
+    if (category === 'writing') return './fungrainy3.webp';
+    return './fungrainy.webp';
+  }, [category]);
+
   const usmanIntro = React.useMemo(() => {
-    const coverConfig = imageConfigMap.get("fungrainy.webp");
+    const coverFileName = coverHref.replace('./', '');
+    const coverConfig = imageConfigMap.get(coverFileName) ?? imageConfigMap.get('fungrainy.webp');
     const dimensions = coverConfig
       ? coverConfig.dimensions[breakpoint](initialViewport)
       : { width: 700, height: 500 };
 
     return {
-      href: "./fungrainy.webp",
+      href: coverHref,
       id: "usman",
       ...dimensions,
       x: center.x - dimensions.width / 2,
       y: center.y - dimensions.height / 2,
     };
-  }, [center.x, center.y, breakpoint, initialViewport, imageConfigMap]);
+  }, [center.x, center.y, breakpoint, initialViewport, imageConfigMap, coverHref]);
 
   const images = React.useMemo(() => {
     // Single row, starting right after the cover image, top-aligned with
@@ -1210,38 +1328,59 @@ export default function ProjectsPage() {
               fill="url(#projects-grid)"
             />
           </motion.g>
-          <motion.image
-            key={usmanIntro.href}
-            href={usmanIntro.href}
-            x={usmanIntro.x}
-            y={usmanIntro.y}
-            width={usmanIntro.width}
-            height={usmanIntro.height}
-            preserveAspectRatio="xMidYMid meet"
-            initial={{ opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }}
-            animate={
-              isExiting
-                ? {
-                    opacity: 0,
-                    scale: 1,
-                    filter: capabilities.prefersReducedMotion ? PROJECTS_FILTER_NONE : PROJECTS_EXIT_IMAGE_FILTER,
-                  }
-                : isMounted
-                  ? { opacity: 1, scale: 1, filter: PROJECTS_FILTER_NONE }
-                  : { opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }
-            }
-            transition={
-              capabilities.prefersReducedMotion
-                ? { duration: 0 }
-                : isExiting
-                  ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-                  : {
-                      opacity: { delay: 0.3, type: 'spring', stiffness: 100, damping: 10 },
-                      scale: { delay: 0.3, type: 'spring', stiffness: 100, damping: 10 },
-                      filter: { duration: 0 },
+          <AnimatePresence>
+            <motion.image
+              key={usmanIntro.href}
+              href={usmanIntro.href}
+              x={usmanIntro.x}
+              y={usmanIntro.y}
+              width={usmanIntro.width}
+              height={usmanIntro.height}
+              preserveAspectRatio="xMidYMid meet"
+              style={{ willChange: 'opacity, transform, filter' }}
+              initial={{ opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }}
+              animate={
+                isExiting
+                  ? {
+                      opacity: 0,
+                      scale: 1,
+                      filter: capabilities.prefersReducedMotion ? PROJECTS_FILTER_NONE : PROJECTS_EXIT_IMAGE_FILTER,
                     }
-            }
-          />
+                  : isMounted
+                    ? { opacity: 1, scale: 1, filter: PROJECTS_FILTER_NONE }
+                    : { opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }
+              }
+              exit={{
+                opacity: 0,
+                scale: 1,
+                filter: capabilities.prefersReducedMotion ? PROJECTS_FILTER_NONE : PROJECTS_EXIT_IMAGE_FILTER,
+                transition: capabilities.prefersReducedMotion
+                  ? { duration: 0 }
+                  : { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' },
+              }}
+              transition={
+                capabilities.prefersReducedMotion
+                  ? { duration: 0 }
+                  : isExiting
+                    ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
+                    : {
+                        opacity: {
+                          delay: coverHasEnteredRef.current ? 0 : 0.3,
+                          type: 'spring',
+                          stiffness: 100,
+                          damping: 10,
+                        },
+                        scale: {
+                          delay: coverHasEnteredRef.current ? 0 : 0.3,
+                          type: 'spring',
+                          stiffness: 100,
+                          damping: 10,
+                        },
+                        filter: { duration: 0 },
+                      }
+              }
+            />
+          </AnimatePresence>
           {visibleImages.map((img, index) => {
             // Stagger the fade-in: each image gets a slight delay based on its index
             const fadeInDelay = index * 0.05; // 50ms between each image
@@ -1254,9 +1393,9 @@ export default function ProjectsPage() {
                 }
               : artworkMounted
                 ? {
-                    opacity: hoveredImage === img.id ? 0.9 : 1,
+                    opacity: !img.disableHover && hoveredImage === img.id ? 0.9 : 1,
                     scale: 1,
-                    filter: hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
+                    filter: !img.disableHover && hoveredImage === img.id ? 'brightness(0.9)' : 'brightness(1)',
                   }
                 : {
                     opacity: 0,
@@ -1269,20 +1408,43 @@ export default function ProjectsPage() {
               : isExiting
                 ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
                 : {
-                    opacity: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 20 },
-                    scale: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 20 },
+                    opacity: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 10 },
+                    scale: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 10 },
                     filter: { duration: 0.15, ease: 'easeInOut' },
                   };
 
-            const sharedHandlers = {
-              onMouseEnter: (e: React.MouseEvent) => {
-                setHoveredImage(img.id);
-                setCursorPos({ x: e.clientX, y: e.clientY });
-              },
-              onMouseLeave: () => setHoveredImage(null),
-              onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
-              onClick: () => handleProjectSelect(img),
-            };
+            // Video content doesn't play well with the spring used on the
+            // static images: stiffness 100 / damping 10 is underdamped, so
+            // it overshoots and settles with a slight bounce. On a static
+            // image that's imperceptible, but scaling a <video> inside a
+            // foreignObject through that overshoot forces extra reflow on
+            // top of already-playing video, which is what was reading as
+            // lag. Same cadence (same delay, similar settle time), just a
+            // plain ease-out tween instead of a bouncy spring.
+            const videoTransitionState = capabilities.prefersReducedMotion
+              ? { duration: 0 }
+              : isExiting
+                ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
+                : {
+                    opacity: { delay: fadeInDelay, duration: 0.4, ease: 'easeOut' },
+                    scale: { delay: fadeInDelay, duration: 0.4, ease: 'easeOut' },
+                    filter: { duration: 0.15, ease: 'easeInOut' },
+                  };
+
+            // Images flagged disableHover (e.g. the kind-feedback testimonials
+            // shot) render like the fungrainy cover: no hover pill, no
+            // brightness/opacity hover state, no click handler.
+            const sharedHandlers = img.disableHover
+              ? {}
+              : {
+                  onMouseEnter: (e: React.MouseEvent) => {
+                    setHoveredImage(img.id);
+                    setCursorPos({ x: e.clientX, y: e.clientY });
+                  },
+                  onMouseLeave: () => setHoveredImage(null),
+                  onMouseMove: (e: React.MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY }),
+                  onClick: () => handleProjectSelect(img),
+                };
 
             if (img.mediaType === 'video') {
               // Videos can't render via SVG <image>, so embed real HTML
@@ -1305,6 +1467,7 @@ export default function ProjectsPage() {
                     playsInline
                     initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
                     animate={animateState}
+                    transition={videoTransitionState}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1329,8 +1492,9 @@ export default function ProjectsPage() {
                 y={img.y}
                 initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
                 animate={animateState}
+                transition={transitionState}
                 style={{
-                  cursor: 'pointer',
+                  cursor: img.disableHover ? 'default' : 'pointer',
                 }}
                 {...sharedHandlers}
               />

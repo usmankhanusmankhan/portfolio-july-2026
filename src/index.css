@@ -144,7 +144,7 @@ svg g {
 }
 
 .card-title {
-  font-size: 16px;
+  font-size: clamp(16px, 3.5vw, 20px);
   font-weight: 500;
   color: var(--color-text);
 }
@@ -152,8 +152,8 @@ svg g {
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-top: 16px;
+  gap: 8px;
+  padding-top: 20px;
 }
 
 .card-image {
@@ -168,6 +168,6 @@ svg g {
 }
 
 .card-description {
-  font-size: 16px;
+  font-size: clamp(12px, 3.5vw, 16px);
   color: var(--color-text);
 }

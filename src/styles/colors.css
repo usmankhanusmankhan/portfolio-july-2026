@@ -9,7 +9,7 @@
  */
 :root {
   /* Backgrounds */
-  --color-bg: oklch(0.98 0.045 128);
+  --color-bg: oklch(98.152% 0.04305 127.156);
   --color-bg-panel: oklch(0.98 0.045 128);
   --color-bg-card: oklch(0.93 0.04 130);
   --color-bg-card-image: oklch(0.98 0.045 128);
