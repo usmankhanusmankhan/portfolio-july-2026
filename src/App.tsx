@@ -12,7 +12,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import BusinessDevelopmentDigest from "./pages/BusinessDevelopmentDigest";
 import AiPatterns from "./pages/AiPatterns";
 import IBMQuantum from "./pages/IBMQuantum"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Analytics } from "@vercel/analytics/react"
 
 function RootLayout() {
   return (
@@ -20,6 +21,7 @@ function RootLayout() {
       <ScrollToTop />
       <Outlet />
       <SpeedInsights />
+      <Analytics />
     </>
   );
 }
