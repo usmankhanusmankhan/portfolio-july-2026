@@ -60,7 +60,8 @@ export default function AiPatterns() {
                     className= {styles.hero_image} 
                     style={{marginBottom: "16px"}} 
                     src="./ai-patterns-hero.webp"
-                    rel="preload"
+                    fetchPriority="high"
+                    decoding="sync"
                 >
                 </img>
                 <div className={styles.roles_and_timelines}>
