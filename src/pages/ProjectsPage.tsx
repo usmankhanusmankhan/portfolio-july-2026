@@ -419,7 +419,7 @@ function ProjectsListView({
                   fontSize: 'clamp(16px, 3.5vw, 20px)',
                   fontWeight: '500',
                   height: 'fit-content',
-                  lineHeight: 'clamp(26px, 3.5vw, 30px)',
+                  lineHeight: '1.5',
                   textAlign: 'left',
                   margin: 0,
                 }}
