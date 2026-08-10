@@ -398,7 +398,7 @@ function ProjectsListView({
             marginBottom: 96,
             display: 'flex',
             flexDirection: 'column',
-            gap: 32,
+            gap: 80,
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -613,7 +613,7 @@ function ProjectsListView({
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 24,
+                gap: 16,
                 width: '100%',
                 position: 'relative',
                 minHeight: 200,
@@ -725,8 +725,8 @@ function ProjectsListView({
               </AnimatePresence>
             </motion.div>
           </div>
-          <div style={{paddingTop: '64px'}}>
-            <h1 style={{fontSize: 'clamp(16px, 3.5vw, 20px)', fontWeight: 500, lineHeight: 'clamp(26px, 3.5vw, 30px)', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
+          <div style={{paddingTop: '16px'}}>
+            <h1 style={{fontSize: 'clamp(16px, 3.5vw, 20px)', fontWeight: 500, lineHeight: '1.5', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
                 <div
                   onClick={() => navigate('/art/art1')} 
