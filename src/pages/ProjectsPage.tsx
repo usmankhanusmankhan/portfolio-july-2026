@@ -398,7 +398,7 @@ function ProjectsListView({
             marginBottom: 96,
             display: 'flex',
             flexDirection: 'column',
-            gap: 80,
+            gap: 'clamp(64px, 10vw, 80px)',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -727,28 +727,31 @@ function ProjectsListView({
           </div>
           <div style={{paddingTop: '16px'}}>
             <h1 style={{fontSize: 'clamp(16px, 3.5vw, 20px)', fontWeight: 500, lineHeight: '1.5', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
-            <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
                 <div
                   onClick={() => navigate('/art/art1')} 
-                  style={{
-                    display: 'flex', 
-                    flexDirection: 'row', 
-                    gap: '24px', 
-                    alignItems: 'center', 
-                    borderRadius: '16px', 
-                    border: '1px solid var(--color-border)', 
-                    padding: '8px',}}>
-                  
-                  <img src='./art1.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
-                  <p style={{color: "#333"}}>on play and its opposing pressures</p>
+                  className="writing-list-items">
+                  <p style={{color: 'var(--color-text-subtle)'}}>on play and its opposing pressures</p>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
-                  <img src='./art2.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
-                  <p style={{color: "#333"}}>on defining the web</p>
+                <div 
+                  onClick={() => navigate('/art/art8')} 
+                  className="writing-list-items">
+                  <p style={{color: 'var(--color-text-subtle)'}}>on contradictions</p>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', gap: '24px', alignItems: 'center', borderRadius: '16px', border: '1px solid var(--color-border)', padding: '8px'}}>
-                  <img src='./art5.webp' style={{width: '20%', height: 'auto', borderRadius: '12px'}}></img>
-                  <p style={{color: "#333"}}>on inspiration</p>
+                <div 
+                  onClick={() => navigate('/art/art2')} 
+                  className="writing-list-items">
+                  <p style={{color: 'var(--color-text-subtle)'}}>on defining the web</p>
+                </div>
+                <div 
+                  onClick={() => navigate('/art/art11')} 
+                  className="writing-list-items">
+                  <p style={{color: 'var(--color-text-subtle)'}}>on tool overload</p>
+                </div>
+                <div 
+                  onClick={() => navigate('/art/art9')} 
+                  className="writing-list-items">
+                  <p style={{color: 'var(--color-text-subtle)'}}>on gathering community</p>
                 </div>
              </div> 
           </div>
@@ -1624,7 +1627,7 @@ export default function ProjectsPage() {
             -
           </button>
         </div>
-        <div style={{}}>{Math.floor(camera.z * 100)}%</div>
+        <div style={{color: 'var(--color-text-subtle)'}}>{Math.floor(camera.z * 100)}%</div>
       </motion.div>
       </>
       )}

@@ -68,7 +68,7 @@ svg g {
 
 .zoom-box {
   background: var(--color-bg);
-  padding: 12px;
+  padding: 8px;
   border-radius: 8px;
   width: fit-content;
   height: fit-content;
@@ -82,10 +82,11 @@ svg g {
 .zoom-button {
   background-color: var(--color-bg);
   cursor: pointer;
-  border: 0.5px solid var(--color-text);
+  border: 0.5px solid var(--color-text-subtle);
   border-radius: 4px;
   font-size: 14px;
   font-family: 'AspektaVF', sans-serif;
+  color: var(--color-text-subtle);
 }
 
 /* Mobile optimizations */
@@ -152,8 +153,8 @@ svg g {
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 20px;
+  gap: clamp(4px, 3.5vw, 8px);
+  padding-top: clamp(16px, 3.5vw, 20px);
 }
 
 .card-image {
@@ -170,4 +171,23 @@ svg g {
 .card-description {
   font-size: clamp(12px, 3.5vw, 16px);
   color: var(--color-text);
+}
+
+.writing-list-items {
+  width: fit-content;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  align-items: center;
+  border-left: 1px solid var(--color-border);
+  padding: 8px 8px 8px 12px;
+  color: var(--color-text-subtle);
+  transition: all 0.1s ease-out;
+}
+
+.writing-list-items:hover {
+  padding: 8px 8px 8px 16px;
+  border-left: 1.5px solid var(--color-text-link);
+  color: var(--color-text-link);
 }
