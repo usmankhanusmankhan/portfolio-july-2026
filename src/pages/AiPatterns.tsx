@@ -101,13 +101,13 @@ export default function AiPatterns() {
                         <h1 className={styles.title_main}>Our standards for showcasing AI patterns across multiple products were disjointed and out of control</h1>
                         <p className={styles.body_main}>In the past few years, AI at Intapp had exploded. Product teams were exploring the possibilities to make AI an integral part of each experience. While this explosion in exploration is natural with new technology, it came with cost; duplicative work, inconsistencies in the user experience, confusion, missed & mismatched expectations for the end user.</p>
                         <div className={styles.card_row}>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Business risk</p>
-                            <p className={styles.card_body}>Having user churn in the product if they feel that the experience is disjointed</p>
+                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
+                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Having user churn in the product if they feel that the experience is disjointed</p>
                         </div>
-                        <div className={styles.info_card}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Business risk</p>
-                            <p className={styles.card_body}>Unnecessary time, money, and resources spent building bespoke components </p>
+                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
+                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Unnecessary time, money, and resources spent building bespoke components </p>
                         </div>
                     </div>
                     </div>
@@ -125,16 +125,34 @@ export default function AiPatterns() {
                     <p className={styles.body_main}>We also found that, through the use of space and color, a lot of emphasis was placed on some AI components that weren't enriching the users' understanding of the AI moment itself. </p>
                     <img src="./entry-form.png" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
-                <div id="industry-analysis" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
+                <div id="industry-analysis" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
                     <h1 className={styles.title_main}>Competitors' AI branding leaned more towards compact visual design yet still informative</h1>
-                    <p className={styles.body_main}>We found that competitors were much more agile in updating their standards on showcase in-product AI. We also found that they were able to communicate a lot more information about their design patterns using less space.</p>
-                    <img src="./leading-with-cross-sell-opportunity.webp" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "32px"}}></img>
-                    <p className={styles.body_main}>Our UX researcher also gave us interview data on clients' concerns on AI security and risk. They mostly center around needing to have certainty on output accuracy and source transparency with links leading back to the original source of data</p>
-                    <img src="./leading-with-cross-sell-opportunity.webp" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
-                </div>
-                <div id="key-principles" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
-                    <h1 className={styles.title_main}>What we learned helped us shape principles that drove us forward</h1>
-                    <p className={styles.body_main}>We found that competitors were much more agile in updating their standards on showcase in-product AI. We also found that they were able to communicate a lot more information about their design patterns using less space.</p>
+                    <p className={styles.body_main}>We found that competitors were much more agile in updating their standards on showcase in-product AI. We also found that they were able to communicate a lot more information about their design patterns using less space. There were two examples of communication on AI usage that really impressed me: IBM's AI badge and Microsoft's disclaimer on enterprise protection.</p>
+                    <img src="./competitors-ai-patterns.webp" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "32px"}}></img>
+                    <p className={styles.body_main}>Our UX researcher also gave us interview insights on clients' concerns on AI security and risk. They mostly center around needing to have certainty on output accuracy and source transparency with links leading back to the original source of data</p>
+                    <div style={{display: 'flex', flexDirection: "column", gap: '32px', padding: '24px', backgroundColor: 'var(--color-bg-muted)', borderRadius: '16px'}}>
+                        <div style={{display: "flex", flexDirection: "row", gap: "12px", alignItems: "top"}}>
+                            1.
+                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+                                <p style={{fontWeight: '500'}}>Users want to link back to the sources that generate content</p>
+                                <p>They don’t need the sources so visible all the time, but people are using the sources as a jumping off point to research more.</p>
+                            </div>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "row", gap: "12px", alignItems: "top"}}>
+                            2.
+                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+                                <p style={{fontWeight: '500'}}>People are most concerned about data privacy, data protection, and accuracy</p>
+                                <p>This goes back to source transparency, linking to the source and having traceability with the sources</p>
+                            </div>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "row", gap: "12px", alignItems: "top"}}>
+                            3.
+                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+                                <p style={{fontWeight: '500'}}>We are missing the interaction design that makes AI feel like AI</p>
+                                <p>Majority of industry standard AI experience have AI specific loading states and generation experiences that illustrate a smart version of “AI thinking”</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="design-choices" style={{marginBottom: "clamp(40px, 10vw, 80px)"}}>
                     <p className={styles.body_main} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "clamp(12px, 4vw, 14px)"}}>Design Choices</p>
