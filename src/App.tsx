@@ -12,12 +12,14 @@ import ScrollToTop from "./components/ScrollToTop";
 import BusinessDevelopmentDigest from "./pages/BusinessDevelopmentDigest";
 import AiPatterns from "./pages/AiPatterns";
 import IBMQuantum from "./pages/IBMQuantum"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 function RootLayout() {
   return (
     <>
       <ScrollToTop />
       <Outlet />
+      <SpeedInsights />
     </>
   );
 }
