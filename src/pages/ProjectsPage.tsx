@@ -526,7 +526,7 @@ function ProjectsListView({
                     }}
                   />
                 </svg>
-                <span style={{ position: 'relative', zIndex: 1, fontWeight: 400 }}>Selected</span>
+                <span style={{ position: 'relative', zIndex: 1, fontWeight: 400 }}>Featured</span>
               </button>
               <button
                 type="button"
@@ -665,7 +665,7 @@ function ProjectsListView({
                         </div>
                       </div>
                     </div>
-                    <div className="card" onClick={() => navigate('/ibmquantum')}>
+                    <div className="card" style={{cursor: 'default'}}>
                       <div className="card-image card-image-medium">
                         <img
                           src="./embedded-celeste-list.webp"
@@ -676,8 +676,8 @@ function ProjectsListView({
                         />
                       </div>
                       <div className="card-content">
-                        <div className="card-title">Embedded Celeste</div>
-                        <div className="card-description">
+                        <div className="card-title" style={{color: 'var(--color-text-subtle)'}}>Embedded Celeste - coming soon!!!</div>
+                        <div className="card-description" style={{color: 'var(--color-text-subtle)'}}>
                           Led design for integrating agentic capabilities in Intapp's flagship product, Dealcloud.
                         </div>
                       </div>

@@ -101,15 +101,15 @@ export default function AiPatterns() {
                         <h1 className={styles.title_main}>Our standards for showcasing AI patterns across multiple products were disjointed and out of control</h1>
                         <p className={styles.body_main}>In the past few years, AI at Intapp had exploded. Product teams were exploring the possibilities to make AI an integral part of each experience. While this explosion in exploration is natural with new technology, it came with cost; duplicative work, inconsistencies in the user experience, confusion, missed & mismatched expectations for the end user.</p>
                         <div className={styles.card_row}>
-                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
-                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Having user churn in the product if they feel that the experience is disjointed</p>
+                            <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                                <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
+                                <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Having user churn in the product if they feel that the experience is disjointed</p>
+                            </div>
+                            <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
+                                <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
+                                <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Unnecessary time, money, and resources spent building bespoke components </p>
+                            </div>
                         </div>
-                        <div className={styles.info_card} style={{backgroundColor: "var(--color-badge-pink-bg)", backgroundImage: "linear-gradient(to bottom, var(--color-badge-pink-bg), var(--color-badge-pink-bg-end))", border: "1px solid var(--color-badge-pink-border"}}>
-                            <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px", color: "var(--color-badge-coral-text)"}}>Business risk</p>
-                            <p className={styles.card_body} style={{color: "var(--color-badge-coral-text)"}}>Unnecessary time, money, and resources spent building bespoke components </p>
-                        </div>
-                    </div>
                     </div>
                 </div>
                 <div id="solution" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
@@ -186,9 +186,9 @@ export default function AiPatterns() {
                             <img src="./ai-patterns-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
                             <p style={{fontWeight: "350", fontSize: "16px"}}>Intapp's visual refresh for AI patterns</p>
                         </div>
-                        <div className={styles.project_card} onClick={() => navigate('/')}>
+                        <div className={styles.project_card} style={{cursor: "default"}}>
                             <img src="./embedded-celeste-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px"}}>Embedded Celeste</p>
+                            <p style={{fontWeight: "350", fontSize: "16px", color: "var(--color-text-muted)"}}>Embedded Celeste - coming soon!!!</p>
                         </div>
                     </div>
                 </div>
