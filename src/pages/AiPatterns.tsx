@@ -116,7 +116,7 @@ export default function AiPatterns() {
                 <div id="solution" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
                     <h1 className={styles.title_main}>We updated standards, defined new principles, and unified patterns for AI-powered forms, summaries, input fields, and more</h1>
                     <video className={styles.case_study_video} autoPlay loop muted playsInline>
-                        <source src="./ai-patterns-modal-loading.mp4" type="video/mp4" />
+                        <source src="./ai-pattern-modal-loading.webm" type="video/webm" />
                     </video>
                 </div>
                 <div id="pain-points" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
@@ -169,7 +169,8 @@ export default function AiPatterns() {
                 <div style={{marginBottom: "clamp(40px, 10vw, 80px)"}}>
                     <h1 className={styles.title_main}>Informative icon set to help the user understand what actions AI was taking</h1>
                     <p className={styles.body_main}>Before, we used a 'sparkle' icon to indicating anything AI related. The issue was that it didn't inform the user of what action the AI was taking in the system, past the fact that it was there. We moved to an icon set that communicated a far broader range, and this example shows they can be applied to loading states</p>
-                    <img src="./icon-set.png" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
+                    <img src="./icon-set.png" style={{width: "100%", height: "auto", borderRadius: "16px", marginBottom: "4px"}}></img>
+                    <img src="./form-loading.png" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div>
                 <div style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
                     <h1 className={styles.title_main}>Enabling transparency through improved source pills</h1>
@@ -183,9 +184,9 @@ export default function AiPatterns() {
                 <div>
                     <p style={{fontWeight: "350", fontSize: "14px", marginBottom: '16px', color: "#333"}}>More projects!!!</p>
                     <div className={styles.project_row} style={{marginBottom: "clamp(64px, 10vw, 128px)"}}>
-                        <div className={styles.project_card} onClick={() => navigate('/')}>
-                            <img src="./ai-patterns-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px"}}>Intapp's visual refresh for AI patterns</p>
+                        <div className={styles.project_card} onClick={() => navigate('/bddigest')}>
+                            <img src="./bd-digest-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
+                            <p style={{fontWeight: "350", fontSize: "16px"}}>Business development digest</p>
                         </div>
                         <div className={styles.project_card} style={{cursor: "default"}}>
                             <img src="./embedded-celeste-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>

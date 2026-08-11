@@ -676,8 +676,8 @@ function ProjectsListView({
                         />
                       </div>
                       <div className="card-content">
-                        <div className="card-title" style={{color: 'var(--color-text-subtle)'}}>Embedded Celeste - coming soon!!!</div>
-                        <div className="card-description" style={{color: 'var(--color-text-subtle)'}}>
+                        <div className="card-title" style={{color: 'var(--color-text-muted)'}}>Embedded Celeste - coming soon!!!</div>
+                        <div className="card-description" style={{color: 'var(--color-text-muted)'}}>
                           Led design for integrating agentic capabilities in Intapp's flagship product, Dealcloud.
                         </div>
                       </div>
@@ -731,27 +731,27 @@ function ProjectsListView({
                 <div
                   onClick={() => navigate('/art/art1')} 
                   className="writing-list-items">
-                  <p style={{color: 'var(--color-text-subtle)'}}>on play and its opposing pressures</p>
+                  <p>on play and its opposing pressures</p>
                 </div>
                 <div 
                   onClick={() => navigate('/art/art8')} 
                   className="writing-list-items">
-                  <p style={{color: 'var(--color-text-subtle)'}}>on contradictions</p>
+                  <p>on contradictions</p>
                 </div>
                 <div 
                   onClick={() => navigate('/art/art2')} 
                   className="writing-list-items">
-                  <p style={{color: 'var(--color-text-subtle)'}}>on defining the web</p>
+                  <p>on defining the web</p>
                 </div>
                 <div 
                   onClick={() => navigate('/art/art11')} 
                   className="writing-list-items">
-                  <p style={{color: 'var(--color-text-subtle)'}}>on tool overload</p>
+                  <p>on tool overload</p>
                 </div>
                 <div 
                   onClick={() => navigate('/art/art9')} 
                   className="writing-list-items">
-                  <p style={{color: 'var(--color-text-subtle)'}}>on gathering community</p>
+                  <p>on gathering community</p>
                 </div>
              </div> 
           </div>
