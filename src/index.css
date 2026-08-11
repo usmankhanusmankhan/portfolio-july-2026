@@ -191,3 +191,48 @@ svg g {
   border-left: 1.5px solid var(--color-text-link);
   color: var(--color-text-link);
 }
+
+.carousel {
+  margin: 96px auto;
+  margin-top: 12px;
+  width: 98%;
+  display: flex;
+  overflow-x: hidden;
+
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.group {
+  display: flex;
+  align-items: top;
+  gap: 1em;
+  animation: spin infinite 60s linear;
+  padding-right: 1em;
+}
+
+
+.carousel:hover .group {
+  animation-play-state: paused;
+}
+
+.feedback-card {
+  flex: 0 0 5em;
+  min-width: 500px;
+  font-weight: 350px;
+  height: fit-content;
+  line-height: 1.6;
+  padding: 1em;
+  padding-top: 1.1em;
+  background-image: linear-gradient(to bottom, var(--color-bg), var(--color-border));
+  border-radius: 8px;
+  border: 1px solid var(--color-border-muted);
+  cursor: default;
+}
+
+@keyframes spin {
+  from {translate: 0;}
+  to {translate: -100%;}
+}

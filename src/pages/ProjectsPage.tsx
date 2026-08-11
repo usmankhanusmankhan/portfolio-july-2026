@@ -395,7 +395,7 @@ function ProjectsListView({
             zIndex: 1,
             maxWidth: 600,
             margin: '0 auto',
-            marginBottom: 96,
+            marginBottom: '0',
             display: 'flex',
             flexDirection: 'column',
             gap: 'clamp(64px, 10vw, 80px)',
@@ -726,7 +726,7 @@ function ProjectsListView({
             </motion.div>
           </div>
           <div style={{paddingTop: '16px'}}>
-            <h1 style={{fontSize: 'clamp(16px, 3.5vw, 20px)', fontWeight: 500, lineHeight: '1.5', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology and creativity. I maintain a Substack, digital per.spectives</h1>
+            <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.55', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology, creativity, and anything else that comes to mind.</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
                 <div
                   onClick={() => navigate('/art/art1')} 
@@ -755,7 +755,94 @@ function ProjectsListView({
                 </div>
              </div> 
           </div>
+          <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.6', marginBottom: '24px'}}>Some kind words from colleagues. Thanks guys!!</h1>
         </div>
+      </div>
+      <div className="carousel">
+          <div className="group">
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./pipsa-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Pipsa Martikainen</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
+                  </div>
+                </div>
+                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too.His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
+              </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./maggie-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Maggie Paparella</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
+                  </div>
+                </div>
+                “I had the privilege of interviewing Usman for his role at Intapp, and from day one it was clear he was <strong style={{fontWeight: '550'}}>something special</strong>. He hit the ground running and produced work that exceeded expectations from the start. I had the opportunity to mentor Usman through a major six-month project, and what struck me most was <strong style={{fontWeight: '550'}}>his genuine curiosity, his willingness to speak up with thoughtful, well-grounded perspectives, and his ability to stay composed and optimistic even under real pressure.</strong><br></br><br></br>He was a true collaborative partner working across teams on complex, cross-product challenges like AI pattern definition and product integrations, always looking to grow and bring others along with him. Any company would be lucky to have the talent and energy Usman brings to a team.”
+                </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./aimee-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Aimee Maroney</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Manager, UI Engineering</p>
+                  </div>
+                </div>
+                “Usman was someone that I never hesitated to reach out to for testing new concepts, for getting feedback on my team's initiatives, and for contribution to our company's design system.<br></br><br></br>It was Usman's suggestion that a CLI would be beneficial to designers looking to code with Claude, that sparked a large initiative on the design system. He then would go on to be a primary tester of that CLI and it was his feedback and testing that helped improve the experience for all users.<br></br><br></br>Not only is Usman <strong style={{fontWeight: '550'}}>an exceptional designer</strong>, but he is also an <strong style={{fontWeight: '550'}}>amazing collaborator and enjoyable person</strong> to work with. He is wise beyond his years and his <strong style={{fontWeight: '550'}}>calmness and positivity</strong> makes any workshop, meeting or offsite a real joy.”
+              </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./michelle-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Michelle Whitman</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Director, Product Design</p>
+                  </div>
+                </div>
+                “Usman is a treasure. Not just because he is a <strong style={{fontWeight: '550'}}>fabulous systems thinker</strong> but also because of his <strong style={{fontWeight: '550'}}>fathomless calm</strong>. He is wonderful to collaborate with, fun and funny, deeply engaged and engaging. However, he has this extraordinary peace and acceptance of the world. You don't often see interns that are self-possessed to this level – you don't often see many people in the world with that kind of assurance. It makes Usman a <strong style={{fontWeight: '550'}}>joy to mentor, to give feedback to and frankly to learn from and just connect</strong>.”
+              </div>
+          </div>
+          <div aria-disabled className="group">
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./pipsa-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Pipsa Martikainen</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
+                  </div>
+                </div>
+                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too.His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
+              </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./maggie-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Maggie Paparella</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
+                  </div>
+                </div>
+                “I had the privilege of interviewing Usman for his role at Intapp, and from day one it was clear he was <strong style={{fontWeight: '550'}}>something special</strong>. He hit the ground running and produced work that exceeded expectations from the start. I had the opportunity to mentor Usman through a major six-month project, and what struck me most was <strong style={{fontWeight: '550'}}>his genuine curiosity, his willingness to speak up with thoughtful, well-grounded perspectives, and his ability to stay composed and optimistic even under real pressure.</strong><br></br><br></br>He was a true collaborative partner working across teams on complex, cross-product challenges like AI pattern definition and product integrations, always looking to grow and bring others along with him. Any company would be lucky to have the talent and energy Usman brings to a team.”
+                </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./aimee-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Aimee Maroney</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Manager, UI Engineering</p>
+                  </div>
+                </div>
+                “Usman was someone that I never hesitated to reach out to for testing new concepts, for getting feedback on my team's initiatives, and for contribution to our company's design system.<br></br><br></br>It was Usman's suggestion that a CLI would be beneficial to designers looking to code with Claude, that sparked a large initiative on the design system. He then would go on to be a primary tester of that CLI and it was his feedback and testing that helped improve the experience for all users.<br></br><br></br>Not only is Usman <strong style={{fontWeight: '550'}}>an exceptional designer</strong>, but he is also an <strong style={{fontWeight: '550'}}>amazing collaborator and enjoyable person</strong> to work with. He is wise beyond his years and his <strong style={{fontWeight: '550'}}>calmness and positivity</strong> makes any workshop, meeting or offsite a real joy.”
+              </div>
+              <div className="feedback-card">
+                <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
+                  <img src="./michelle-avatar.svg" style={{height: '32px', width: '32px'}}></img>
+                  <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <p style={{fontWeight: '500', lineHeight: '1.2'}}>Pipsa Martikainen</p>
+                      <p style={{color: 'var(--color-text-subtle)'}}>Director, Product Design</p>
+                  </div>
+                </div>
+                “Usman is a treasure. Not just because he is a <strong style={{fontWeight: '550'}}>fabulous systems thinker</strong> but also because of his <strong style={{fontWeight: '550'}}>fathomless calm</strong>. He is wonderful to collaborate with, fun and funny, deeply engaged and engaging. However, he has this extraordinary peace and acceptance of the world. You don't often see interns that are self-possessed to this level – you don't often see many people in the world with that kind of assurance. It makes Usman a <strong style={{fontWeight: '550'}}>joy to mentor, to give feedback to and frankly to learn from and just connect</strong>.”
+              </div>
+          </div>
       </div>
     </motion.div>
   );
