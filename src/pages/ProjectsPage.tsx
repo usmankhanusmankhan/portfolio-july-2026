@@ -134,12 +134,13 @@ function throttle(func: Function, limit: number) {
   };
 }
 
+
 const PROJECTS_EXIT_DURATION = 0.15;
 const PROJECTS_EXIT_BLUR = 'blur(5px)';
 const PROJECTS_EXIT_IMAGE_FILTER = 'blur(5px)';
 const PROJECTS_FILTER_NONE = 'blur(0px)';
 
-const IMAGE_GAP = 96; // horizontal spacing between images within a row
+const IMAGE_GAP = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 64 : 96; // horizontal spacing between images within a row
 const DEFAULT_IMAGE_DIMENSIONS = { width: 500, height: 500 };
 
 type Viewport = { x: number; y: number };
