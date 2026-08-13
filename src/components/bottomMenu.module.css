@@ -53,7 +53,7 @@
 }
 
 .link a:hover {
-    color: var(--color-text);
+    color: var(--color-badge-coral);
 }
 
 .link a:active {
@@ -82,7 +82,7 @@
 }
 
 .view-switcher-button:hover {
-    color: var(--color-text);
+    color: var(--color-badge-coral);
 }
 
 .view-switcher-button[aria-selected="true"] {

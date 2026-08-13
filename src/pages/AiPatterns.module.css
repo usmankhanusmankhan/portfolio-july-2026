@@ -2,16 +2,7 @@
     font-family: AspektaVF;
 }
 
-html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 64px;
-}
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
 
 .casestudy {
     margin: 0 auto;

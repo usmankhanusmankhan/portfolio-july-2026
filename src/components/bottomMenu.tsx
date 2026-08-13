@@ -64,7 +64,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
             </div>
             {linksArray.map((link: Link) => (
                     <div key={link.href} className={styles['link']}>
-                        {link.name === 'RESUME' ? (
+                        {link.name === 'Resume' ? (
                             <a href={link.href} target="_blank" rel="noopener noreferrer">
                                 {link.name}
                             </a>

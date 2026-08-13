@@ -1,5 +1,4 @@
 import * as React from "react";
-import ReactDOM from "react-dom";
 import { useNavigate, useBlocker, useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
@@ -73,23 +72,6 @@ function panCamera(camera: Camera, dx: number, dy: number): Camera {
 
 function zoomCamera(camera: Camera, point: Point, dz: number): Camera {
   const zoom = Math.max(0.2, Math.min(3, camera.z - dz * camera.z));
-
-  const p1 = screenToCanvas(point, camera);
-  const p2 = screenToCanvas(point, { ...camera, z: zoom });
-
-  return {
-    x: camera.x + (p2.x - p1.x),
-    y: camera.y + (p2.y - p1.y),
-    z: zoom
-  };
-}
-
-// Like zoomCamera, but takes an absolute target zoom instead of a delta.
-// Pinch gestures compute the desired zoom directly from finger spread
-// (distance / initialDistance), so there's no "dz" to hand zoomCamera —
-// this anchors that target zoom on `point` the same way zoomCamera does.
-function zoomCameraTo(camera: Camera, point: Point, targetZoom: number): Camera {
-  const zoom = Math.max(0.2, Math.min(3, targetZoom));
 
   const p1 = screenToCanvas(point, camera);
   const p2 = screenToCanvas(point, { ...camera, z: zoom });
@@ -871,9 +853,6 @@ export default function ProjectsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const ref = React.useRef<SVGSVGElement>(null);
-  // Videos are portaled into this plain HTML layer instead of rendered via
-  // SVG <foreignObject> — see the mediaType === 'video' branch below for why.
-  const [videoLayerNode, setVideoLayerNode] = React.useState<HTMLDivElement | null>(null);
   const [camera, setCamera] = React.useState(DEFAULT_CAMERA);
   const capabilities = React.useMemo(() => getDeviceCapabilities(), []);
   const breakpoint = useBreakpoint();
@@ -1099,58 +1078,11 @@ export default function ProjectsPage() {
     let lastTouch: { x: number; y: number } | null = null;
     let initialDistance = 0;
     let initialZoom = 1;
-    // Midpoint between the two fingers during a pinch, tracked frame to
-    // frame so a two-finger drag (moving both fingers together) can pan
-    // the camera at the same time as the pinch zooms it — same as
-    // Google Maps/Photos.
-    let lastMidpoint: Point | null = null;
-
-    // Momentum/inertia after a single-finger pan is released, tracked as
-    // finger speed in px/ms so playback is frame-rate independent.
-    let velocity = { x: 0, y: 0 };
-    let lastMoveTime = 0;
-    let momentumRafId: number | null = null;
-
-    function stopMomentum() {
-      if (momentumRafId !== null) {
-        cancelAnimationFrame(momentumRafId);
-        momentumRafId = null;
-      }
-    }
-
-    function startMomentum() {
-      const FRICTION_PER_MS = 0.998; // exponential decay factor per ms
-      const STOP_THRESHOLD = 0.02; // px/ms
-      let lastTime = performance.now();
-
-      function step(now: number) {
-        const dt = Math.max(1, now - lastTime);
-        lastTime = now;
-
-        const decay = Math.pow(FRICTION_PER_MS, dt);
-        velocity = { x: velocity.x * decay, y: velocity.y * decay };
-
-        if (Math.hypot(velocity.x, velocity.y) < STOP_THRESHOLD) {
-          momentumRafId = null;
-          return;
-        }
-
-        setCamera((camera) => panCamera(camera, -velocity.x * dt, -velocity.y * dt));
-        momentumRafId = requestAnimationFrame(step);
-      }
-
-      momentumRafId = requestAnimationFrame(step);
-    }
 
     function handleTouchStart(e: TouchEvent) {
-      // A new touch always takes over from any in-flight momentum.
-      stopMomentum();
-
       if (e.touches.length === 1) {
         touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         lastTouch = touchStart;
-        velocity = { x: 0, y: 0 };
-        lastMoveTime = e.timeStamp;
       } else if (e.touches.length === 2) {
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
@@ -1159,25 +1091,17 @@ export default function ProjectsPage() {
           touch2.clientY - touch1.clientY
         );
         initialZoom = cameraRef.current.z;
-        lastMidpoint = {
-          x: (touch1.clientX + touch2.clientX) / 2,
-          y: (touch1.clientY + touch2.clientY) / 2,
-        };
       }
     }
 
     function handleTouchMove(e: TouchEvent) {
       e.preventDefault();
-
+      
       if (e.touches.length === 1 && touchStart) {
         const touch = e.touches[0];
         const dx = touch.clientX - (lastTouch?.x || touchStart.x);
         const dy = touch.clientY - (lastTouch?.y || touchStart.y);
-
-        const dt = Math.max(1, e.timeStamp - lastMoveTime);
-        velocity = { x: dx / dt, y: dy / dt };
-        lastMoveTime = e.timeStamp;
-
+        
         // Negated so content follows the finger: dragging left moves the
         // camera right (panCamera itself subtracts dx/dy from camera.x/y).
         setCamera((camera) => panCamera(camera, -dx, -dy));
@@ -1189,47 +1113,18 @@ export default function ProjectsPage() {
           touch2.clientX - touch1.clientX,
           touch2.clientY - touch1.clientY
         );
-        const midpoint = {
-          x: (touch1.clientX + touch2.clientX) / 2,
-          y: (touch1.clientY + touch2.clientY) / 2,
-        };
-
+        
         const scale = distance / initialDistance;
-        const newZoom = initialZoom * scale;
-
-        setCamera((camera) => {
-          // Anchor the zoom on the pinch midpoint so whatever is under
-          // the fingers stays under the fingers, instead of always
-          // zooming toward the canvas origin (top-left).
-          let next = zoomCameraTo(camera, midpoint, newZoom);
-
-          // Two fingers moving together (not just spreading/pinching)
-          // pans the camera by that shared movement.
-          if (lastMidpoint) {
-            next = panCamera(
-              next,
-              -(midpoint.x - lastMidpoint.x),
-              -(midpoint.y - lastMidpoint.y)
-            );
-          }
-          return next;
-        });
-
-        lastMidpoint = midpoint;
+        const newZoom = Math.max(0.2, Math.min(3, initialZoom * scale));
+        
+        setCamera((camera) => ({
+          ...camera,
+          z: newZoom
+        }));
       }
     }
 
-    function handleTouchEnd(e: TouchEvent) {
-      // Single-finger pan just ended with some speed: keep panning and
-      // let it decay, like a map "fling".
-      if (e.touches.length === 0 && Math.hypot(velocity.x, velocity.y) > 0.05) {
-        startMomentum();
-      }
-
-      if (e.touches.length < 2) {
-        lastMidpoint = null;
-      }
-
+    function handleTouchEnd() {
       touchStart = null;
       lastTouch = null;
     }
@@ -1237,14 +1132,11 @@ export default function ProjectsPage() {
     window.addEventListener("touchstart", handleTouchStart, { passive: false });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
     window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("touchcancel", handleTouchEnd);
 
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("touchcancel", handleTouchEnd);
-      stopMomentum();
     };
   }, [capabilities.isMobile, viewMode]);
 
@@ -1673,57 +1565,37 @@ export default function ProjectsPage() {
                   };
 
             if (img.mediaType === 'video') {
-              // Videos used to render via SVG <foreignObject>, relying on
-              // it inheriting the ancestor <g>'s CSS `transform` (the
-              // camera pan/zoom). Safari has a long-standing WebKit bug
-              // where a <video> inside a <foreignObject> is composited on
-              // its own hardware decode layer that doesn't get
-              // re-transformed when an ancestor's CSS transform changes —
-              // only actual layout/attribute changes on the foreignObject
-              // itself trigger a repaint. Practically: the video paints
-              // once wherever it happens to land and then stays frozen
-              // there while everything else (correctly) pans and zooms
-              // around it. Chrome doesn't share this bug.
-              //
-              // The fix is to take the video out of the SVG's transform
-              // inheritance chain entirely: portal it into a plain HTML
-              // layer sitting on top of the SVG, and position it with
-              // ordinary left/top/width/height computed straight from the
-              // camera on every render — no CSS transform involved, so
-              // there's nothing for Safari to fail to propagate.
-              if (!videoLayerNode) return null;
-
-              const screenX = (img.x + camera.x) * camera.z;
-              const screenY = (img.y + camera.y) * camera.z;
-              const screenWidth = (img.width || 700) * camera.z;
-              const screenHeight = (img.height || 700) * camera.z;
-
-              return ReactDOM.createPortal(
-                <motion.video
+              // Videos can't render via SVG <image>, so embed real HTML
+              // through <foreignObject>, which inherits the same
+              // coordinate system and pan/zoom transform as the canvas.
+              return (
+                <foreignObject
                   key={img.id}
-                  src={img.href}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
-                  animate={animateState}
-                  transition={videoTransitionState}
-                  style={{
-                    position: 'absolute',
-                    left: screenX,
-                    top: screenY,
-                    width: screenWidth,
-                    height: screenHeight,
-                    objectFit: 'cover',
-                    cursor: 'pointer',
-                    display: 'block',
-                    pointerEvents: 'auto',
-                  }}
-                  {...sharedHandlers}
-                />,
-                videoLayerNode,
-                img.id
+                  x={img.x}
+                  y={img.y}
+                  width={img.width || 700}
+                  height={img.height || 700}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <motion.video
+                    src={img.href}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
+                    animate={animateState}
+                    transition={videoTransitionState}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      display: 'block',
+                    }}
+                    {...sharedHandlers}
+                  />
+                </foreignObject>
               );
             }
 
@@ -1748,20 +1620,6 @@ export default function ProjectsPage() {
           })}
         </g>
       </svg>
-      {/* Videos portal into this layer instead of living inside the SVG —
-          see the mediaType === 'video' branch above for why. Sized to match
-          the SVG's full-viewport footprint; child videos are positioned
-          with plain left/top/width/height computed from the camera, so
-          they never depend on an inherited CSS transform. */}
-      <div
-        ref={setVideoLayerNode}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          overflow: 'hidden',
-          pointerEvents: 'none',
-        }}
-      />
       <AnimatePresence>
         {hoveredImage && (
           <motion.div

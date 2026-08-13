@@ -163,11 +163,11 @@ export default function BusinessDevelopmentDigest() {
                     <div className={styles.project_row} style={{marginBottom: "clamp(64px, 10vw, 128px)"}}>
                         <div className={styles.project_card} onClick={() => navigate('/aipatterns')}>
                             <img src="./ai-patterns-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px"}}>Intapp's visual refresh for AI patterns</p>
+                            <p style={{fontWeight: "350", fontSize: "clamp(12px, 3.5vw, 16px"}}>Intapp's visual refresh for AI patterns</p>
                         </div>
-                        <div className={styles.project_card} onClick={() => navigate('/')}>
+                        <div className={styles.project_card} style={{cursor: 'default'}}>
                             <img src="./embedded-celeste-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px"}}>Embedded Celeste</p>
+                            <p style={{fontWeight: "350", fontSize: "clamp(12px, 3.5vw, 16px)", color: "var(--color-text-muted)"}}>Embedded Celeste - coming soon!!!</p>
                         </div>
                     </div>
                 </div>

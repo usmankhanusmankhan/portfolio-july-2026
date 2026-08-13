@@ -5,8 +5,12 @@ export default function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  const html = document.documentElement;
+  const prev = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
+  window.scrollTo({top: 0, behavior: "instant"});
+  html.style.scrollBehavior = prev;
+}, [pathname]);
 
   return null;
 }

@@ -186,11 +186,11 @@ export default function AiPatterns() {
                     <div className={styles.project_row} style={{marginBottom: "clamp(64px, 10vw, 128px)"}}>
                         <div className={styles.project_card} onClick={() => navigate('/bddigest')}>
                             <img src="./bd-digest-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px"}}>Business development digest</p>
+                            <p style={{fontWeight: "350", fontSize: "clamp(12px, 3.5vw, 16px"}}>Business development digest</p>
                         </div>
                         <div className={styles.project_card} style={{cursor: "default"}}>
                             <img src="./embedded-celeste-list.webp" style={{width: "100%", height: "auto", borderRadius: "12px"}}></img>
-                            <p style={{fontWeight: "350", fontSize: "16px", color: "var(--color-text-muted)"}}>Embedded Celeste - coming soon!!!</p>
+                            <p style={{fontWeight: "350", fontSize: "clamp(12px, 3.5vw, 16px", color: "var(--color-text-muted)"}}>Embedded Celeste - coming soon!!!</p>
                         </div>
                     </div>
                 </div>
