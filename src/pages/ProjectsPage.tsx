@@ -1903,7 +1903,7 @@ export default function ProjectsPage() {
                 animate={{ x: ['-50%', '0%'] }}
                 transition={{
                   repeat: Infinity,
-                  duration: pillTitleWidth > 0 ? pillTitleWidth : 12,
+                  duration: hoveredPillText.length < 20 ? 12 : 16,
                   ease: 'linear',
                 }}
               >
