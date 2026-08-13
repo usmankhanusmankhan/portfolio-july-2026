@@ -457,7 +457,7 @@ function ProjectsListView({
               style={{
                   fontFamily: 'AspektaVF',
                   fontSize: 'clamp(12px, 3.5vw, 16px)',
-                  fontWeight: '350',
+                  fontWeight: '300',
                   color: 'var(--color-text-subtle)'}}
             >
               With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
@@ -787,7 +787,7 @@ function ProjectsListView({
                       <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
                   </div>
                 </div>
-                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too.His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
+                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too. His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
               </div>
               <div className="feedback-card">
                 <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
@@ -829,7 +829,7 @@ function ProjectsListView({
                       <p style={{color: 'var(--color-text-subtle)'}}>Senior Product Designer</p>
                   </div>
                 </div>
-                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too.His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
+                “What stands out most is his <strong style={{fontWeight: '550'}}>calm, curious approach to design</strong>. He's <strong style={{fontWeight: '550'}}>firm on user value</strong> but always ready to collaborate with stakeholders, and he brings <strong style={{fontWeight: '550'}}>genuine attention to detail</strong> and user flow in his craft. His feedback in critiques was always well grounded, with clear ideas on how to push the work further.<br></br><br></br>He was also the frontrunner on our team for using AI in prototyping, producing impressive artifacts with tools like Cursor and Claude Code. His approach to prototyping and design pushed my own thinking on the topic, too. His presentation style is a big part of what makes him effective. <strong style={{fontWeight: '550'}}>Light-hearted, calm, and genuinely curious</strong>, it's the kind of delivery that makes feedback stick instead of just being heard in the moment.”
               </div>
               <div className="feedback-card">
                 <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
