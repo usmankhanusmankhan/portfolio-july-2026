@@ -1059,6 +1059,17 @@ export default function ProjectsPage() {
     [camera.z, camera.x, camera.y]
   );
 
+  // Keep a ref to the latest camera so the touch effect below can read
+  // camera.z without needing it in its dependency array. (Previously the
+  // effect depended on camera.z directly, which meant it tore down and
+  // re-subscribed on every zoom update mid-pinch, resetting
+  // `initialDistance` to 0. The next touchmove then divided by that 0,
+  // producing Infinity/NaN and snapping zoom straight to the 300% ceiling.)
+  const cameraRef = React.useRef(camera);
+  React.useEffect(() => {
+    cameraRef.current = camera;
+  }, [camera]);
+
   // Touch event support for mobile
   React.useEffect(() => {
     if (!capabilities.isMobile || viewMode !== 'canvas') return;
@@ -1079,7 +1090,7 @@ export default function ProjectsPage() {
           touch2.clientX - touch1.clientX,
           touch2.clientY - touch1.clientY
         );
-        initialZoom = camera.z;
+        initialZoom = cameraRef.current.z;
       }
     }
 
@@ -1091,7 +1102,9 @@ export default function ProjectsPage() {
         const dx = touch.clientX - (lastTouch?.x || touchStart.x);
         const dy = touch.clientY - (lastTouch?.y || touchStart.y);
         
-        setCamera((camera) => panCamera(camera, dx, dy));
+        // Negated so content follows the finger: dragging left moves the
+        // camera right (panCamera itself subtracts dx/dy from camera.x/y).
+        setCamera((camera) => panCamera(camera, -dx, -dy));
         lastTouch = { x: touch.clientX, y: touch.clientY };
       } else if (e.touches.length === 2) {
         const touch1 = e.touches[0];
@@ -1125,7 +1138,7 @@ export default function ProjectsPage() {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [capabilities.isMobile, camera.z, viewMode]);
+  }, [capabilities.isMobile, viewMode]);
 
   // Coalesce wheel events into a single camera update per animation frame.
   // Accumulating deltas (instead of time-throttling and dropping events) keeps
