@@ -184,6 +184,7 @@ svg g {
   border-left: 1px solid var(--color-border);
   padding: 8px 8px 8px 12px;
   color: var(--color-text-subtle);
+  font-size: clamp(12px, 3.5vw, 16px);
   transition: all 0.1s ease-out;
 }
 
@@ -214,11 +215,31 @@ svg g {
   padding-right: 16px;
 }
 
+
+
 @media (max-width: 500px) {
   .group {
     animation: none;
     overflow-x: auto;
+    padding-right: 0px;
   }
+
+  #second-group {
+    display: none;
+  }
+
+  .group::-webkit-scrollbar {
+  display: none;
+  }
+
+  .carousel {
+  margin: 96px auto;
+  margin-top: 8px;
+  width: 94%;
+  display: flex;
+  overflow-x: hidden;
+
+}
 }
 
 

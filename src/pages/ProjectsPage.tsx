@@ -468,7 +468,7 @@ function ProjectsListView({
                   background: 'none',
                   cursor: 'pointer',
                   fontFamily: '"AspektaVF", sans-serif',
-                  fontSize: 14,
+                  fontSize: 'clamp(12px, 3.5vw, 14px)',
                   fontWeight: 500,
                   color: 'var(--color-text)',
                 }}
@@ -513,7 +513,7 @@ function ProjectsListView({
                     d="M 50 2 A 48 16 0 0 1 98 18 A 48 16 0 0 1 50 34 A 48 16 0 0 1 2 18 A 48 16 0 0 1 50 2"
                     fill="none"
                     stroke="var(--color-text)"
-                    strokeWidth="1.5"
+                    strokeWidth="0.75"
                     pathLength={tabBorderLength}
                     strokeDasharray={tabBorderLength}
                     style={{
@@ -541,7 +541,7 @@ function ProjectsListView({
                   background: 'none',
                   cursor: 'pointer',
                   fontFamily: '"AspektaVF", sans-serif',
-                  fontSize: 14,
+                  fontSize: 'clamp(12px, 3.5vw, 14px)',
                   fontWeight: 500,
                   color: 'var(--color-text)',
                 }}
@@ -586,7 +586,7 @@ function ProjectsListView({
                     d="M 50 2 A 48 16 0 0 1 98 18 A 48 16 0 0 1 50 34 A 48 16 0 0 1 2 18 A 48 16 0 0 1 50 2"
                     fill="none"
                     stroke="var(--color-text)"
-                    strokeWidth="1.5"
+                    strokeWidth="0.75"
                     pathLength={tabBorderLength}
                     strokeDasharray={tabBorderLength}
                     style={{
@@ -755,7 +755,7 @@ function ProjectsListView({
                 </div>
              </div> 
           </div>
-          <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.6', marginBottom: '24px'}}>Some kind words from colleagues. Thanks guys!!</h1>
+          <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.6', marginBottom: 'clamp(16px, 3.5vw, 24px)'}}>Some kind words from colleagues. Thanks guys!!</h1>
         </div>
       </div>
       <div className="carousel">
@@ -801,7 +801,7 @@ function ProjectsListView({
                 “Usman is a treasure. Not just because he is a <strong style={{fontWeight: '550'}}>fabulous systems thinker</strong> but also because of his <strong style={{fontWeight: '550'}}>fathomless calm</strong>. He is wonderful to collaborate with, fun and funny, deeply engaged and engaging. However, he has this extraordinary peace and acceptance of the world. You don't often see interns that are self-possessed to this level – you don't often see many people in the world with that kind of assurance. It makes Usman a <strong style={{fontWeight: '550'}}>joy to mentor, to give feedback to and frankly to learn from and just connect</strong>.”
               </div>
           </div>
-          <div aria-disabled className="group">
+          <div aria-disabled id="second-group" className="group">
               <div className="feedback-card">
                 <div style={{display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '16px', alignItems: 'top'}}>
                   <img src="./pipsa-avatar.svg" style={{height: '32px', width: '32px'}}></img>
@@ -1597,7 +1597,6 @@ export default function ProjectsPage() {
                 initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
                 animate={animateState}
                 transition={transitionState}
-                loading='lazy'
                 style={{
                   cursor: img.disableHover || img.pillOnly ? 'default' : 'pointer',
                 }}
