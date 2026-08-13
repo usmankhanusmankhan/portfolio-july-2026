@@ -1,4 +1,5 @@
 import * as React from "react";
+import ReactDOM from "react-dom";
 import { useNavigate, useBlocker, useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
@@ -870,6 +871,9 @@ export default function ProjectsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const ref = React.useRef<SVGSVGElement>(null);
+  // Videos are portaled into this plain HTML layer instead of rendered via
+  // SVG <foreignObject> — see the mediaType === 'video' branch below for why.
+  const [videoLayerNode, setVideoLayerNode] = React.useState<HTMLDivElement | null>(null);
   const [camera, setCamera] = React.useState(DEFAULT_CAMERA);
   const capabilities = React.useMemo(() => getDeviceCapabilities(), []);
   const breakpoint = useBreakpoint();
@@ -1669,37 +1673,57 @@ export default function ProjectsPage() {
                   };
 
             if (img.mediaType === 'video') {
-              // Videos can't render via SVG <image>, so embed real HTML
-              // through <foreignObject>, which inherits the same
-              // coordinate system and pan/zoom transform as the canvas.
-              return (
-                <foreignObject
+              // Videos used to render via SVG <foreignObject>, relying on
+              // it inheriting the ancestor <g>'s CSS `transform` (the
+              // camera pan/zoom). Safari has a long-standing WebKit bug
+              // where a <video> inside a <foreignObject> is composited on
+              // its own hardware decode layer that doesn't get
+              // re-transformed when an ancestor's CSS transform changes —
+              // only actual layout/attribute changes on the foreignObject
+              // itself trigger a repaint. Practically: the video paints
+              // once wherever it happens to land and then stays frozen
+              // there while everything else (correctly) pans and zooms
+              // around it. Chrome doesn't share this bug.
+              //
+              // The fix is to take the video out of the SVG's transform
+              // inheritance chain entirely: portal it into a plain HTML
+              // layer sitting on top of the SVG, and position it with
+              // ordinary left/top/width/height computed straight from the
+              // camera on every render — no CSS transform involved, so
+              // there's nothing for Safari to fail to propagate.
+              if (!videoLayerNode) return null;
+
+              const screenX = (img.x + camera.x) * camera.z;
+              const screenY = (img.y + camera.y) * camera.z;
+              const screenWidth = (img.width || 700) * camera.z;
+              const screenHeight = (img.height || 700) * camera.z;
+
+              return ReactDOM.createPortal(
+                <motion.video
                   key={img.id}
-                  x={img.x}
-                  y={img.y}
-                  width={img.width || 700}
-                  height={img.height || 700}
-                  style={{ overflow: 'hidden' }}
-                >
-                  <motion.video
-                    src={img.href}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
-                    animate={animateState}
-                    transition={videoTransitionState}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      display: 'block',
-                    }}
-                    {...sharedHandlers}
-                  />
-                </foreignObject>
+                  src={img.href}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
+                  animate={animateState}
+                  transition={videoTransitionState}
+                  style={{
+                    position: 'absolute',
+                    left: screenX,
+                    top: screenY,
+                    width: screenWidth,
+                    height: screenHeight,
+                    objectFit: 'cover',
+                    cursor: 'pointer',
+                    display: 'block',
+                    pointerEvents: 'auto',
+                  }}
+                  {...sharedHandlers}
+                />,
+                videoLayerNode,
+                img.id
               );
             }
 
@@ -1724,6 +1748,20 @@ export default function ProjectsPage() {
           })}
         </g>
       </svg>
+      {/* Videos portal into this layer instead of living inside the SVG —
+          see the mediaType === 'video' branch above for why. Sized to match
+          the SVG's full-viewport footprint; child videos are positioned
+          with plain left/top/width/height computed from the camera, so
+          they never depend on an inherited CSS transform. */}
+      <div
+        ref={setVideoLayerNode}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          overflow: 'hidden',
+          pointerEvents: 'none',
+        }}
+      />
       <AnimatePresence>
         {hoveredImage && (
           <motion.div
