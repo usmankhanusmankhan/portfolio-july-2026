@@ -666,7 +666,7 @@ function ProjectsListView({
                         </div>
                       </div>
                     </div>
-                    <div className="card" style={{cursor: 'default'}}>
+                    <div className="card" style={{cursor: 'default', transform: 'none'}}>
                       <div className="card-image card-image-medium">
                         <img
                           src="./embedded-celeste-list.webp"

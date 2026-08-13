@@ -2,6 +2,7 @@ import React, { useState, useEffect, JSX } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, spring } from 'framer-motion';
 import artContent from '../config/artContent.json';
+import styles from './ArtDetail.module.css';
 
 // Renders a link with a custom color (and a distinct hover color), plus a
 // small popover above it showing the destination URL on hover.
@@ -9,7 +10,7 @@ const LinkWithPreview: React.FC<{ label: string; url: string }> = ({ label, url 
     const [hovered, setHovered] = useState(false);
 
     // Edit these to change link appearance
-    const linkColor = 'var(--color-text-link, #4f46e5)';
+    const linkColor = 'var(--color-text-link)';
     const linkHoverColor = 'var(--color-badge-coral, #7c7ff0)';
 
     return (
@@ -143,37 +144,25 @@ export default function ArtDetail() {
 
     return (
         <div className="art-detail-page">
-
-            <button
-                type="button"
-                onClick={() => navigate(-1)}
-                title="Back"
-                style={{
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    gap: '8px',
-                    padding: '0px',
-                    alignItems: 'center',
-                    color: 'var(--color-text)',
-                    fontFamily: 'AspektaVF',
-                    position: 'fixed',
-                    top: '48px',
-                    left: '48px',
-                }}
-            >
-                Back
-                <img
-                    src="/ids-icon-keyboard-arrow-return.svg"
-                    alt=""
-                    width={12}
-                    height={12}
-                    style={{ display: 'block' }}
-                />
-            </button>
+            <div className={styles.back_container}>
+                <button
+                    className={styles.back_button}
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    title="Back"
+                >
+                    Back
+                    <img
+                        src="/ids-icon-keyboard-arrow-return.svg"
+                        alt=""
+                        width={12}
+                        height={12}
+                        style={{ display: 'block' }}
+                    />
+                </button>
+            </div>
             <div style={{
-                paddingTop: 'clamp(64px, 10vw, 96px)',
+                paddingTop: 'clamp(80px, 10vw, 96px)',
                 paddingBottom: 'clamp(64px, 10vw, 96px)',
                 paddingLeft: 'clamp(20px, 5vw, 32px)',
                 paddingRight: 'clamp(20px, 5vw, 32px)',
@@ -229,13 +218,14 @@ export default function ArtDetail() {
                                     style={{
                                         fontWeight: segment.bold ? 500 : 300,
                                         fontSize: segment.bold ? 'clamp(12px, 3.5vw, 16px)' : 'clamp(12px, 3.5vw, 16px)',
-                                        lineHeight: segment.bold ? 'clamp(28px, 3.5vw, 30px)' : 'clamp(28px, 3.5vw, 30px)',
+                                        lineHeight: segment.bold ? 1.7 : 1.8,
                                         display: 'block',
                                         color: 'var(--color-text)',
                                         marginTop: segment.bold && index > 0 ? `${bodyBoldMarginBottom}px` : 0,
+                                        paddingTop: segment.bold && index > 0 ? 32 : 0,
                                         marginBottom: segment.bold && index < getBodyContent(id).length - 1
                                             ? `${bodyBoldMarginBottom}px`
-                                            : 48,
+                                            : 32,
                                     }}
                                 >
                                     {renderWithLinks(segment.text)}

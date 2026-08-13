@@ -141,6 +141,8 @@ svg g {
 
 .card:hover {
   cursor: pointer;
+  transform: translateY(-4px);
+  transition: all 0.1s ease-out;
   
 }
 
