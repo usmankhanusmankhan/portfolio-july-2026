@@ -436,10 +436,10 @@ function ProjectsListView({
               }}
               transition={{ duration: 0.5, delay: 0.3, ease: 'easeInOut' }}
               style={{
-                  color: 'var(--color-text)',
                   fontFamily: 'AspektaVF',
                   fontSize: 'clamp(12px, 3.5vw, 16px)',
-                  fontWeight: '350',}}
+                  fontWeight: '350',
+                  color: 'var(--color-text-subtle)'}}
             >
               With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
             </motion.h2>
@@ -1597,6 +1597,7 @@ export default function ProjectsPage() {
                 initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
                 animate={animateState}
                 transition={transitionState}
+                loading='lazy'
                 style={{
                   cursor: img.disableHover || img.pillOnly ? 'default' : 'pointer',
                 }}
