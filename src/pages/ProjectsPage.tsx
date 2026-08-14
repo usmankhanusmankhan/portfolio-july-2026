@@ -778,7 +778,7 @@ function ProjectsListView({
             </motion.div>
           </div>
           <div style={{paddingTop: '16px'}}>
-            <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.55', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology, creativity, and anything else that comes to mind.</h1>
+            <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.55', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology, creativity, design, and anything else that comes to mind.</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
                 <div
                   onClick={() => navigate('/art/art1')} 
@@ -2094,7 +2094,6 @@ export default function ProjectsPage() {
                 <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
                   <input
                     type="password"
-                    autoFocus
                     value={passwordInput}
                     onChange={(e) => {
                       setPasswordInput(e.target.value);
