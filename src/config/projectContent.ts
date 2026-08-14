@@ -23,8 +23,12 @@ export interface ProjectImageEntry {
 }
 
 export const professionalProjects: ProjectImageEntry[] = [
-  { href: "./business-development-digest.webp", id: "business-development-digest", link: "/bddigest", hoverText: "here we go!!!" },
-  { href: "./ai-patterns.webp", id: "ai-patterns", link: "/aipatterns", hoverText: "here we go!!!" },
+  // These two are gated behind a shared password (see PASSWORD_PROTECTED_IDS
+  // in ProjectsPage.tsx). The "password protected!!!" hoverText below is the
+  // locked-state default; ProjectsPage swaps it for "here we go!!!" once the
+  // visitor has unlocked case studies.
+  { href: "./business-development-digest.webp", id: "business-development-digest", link: "/bddigest", hoverText: "password protected!!!" },
+  { href: "./ai-patterns.webp", id: "ai-patterns", link: "/aipatterns", hoverText: "password protected!!!" },
   { href: "./embedded-celeste.webp", id: "ibm-quantum", link: "/ibmquantum", hoverText: "coming soon!!!", pillOnly: true},
   { href: "./kind-feedback.webp", id: "kind-feedback", disableHover: true },
 ];
@@ -35,10 +39,10 @@ export const experimentalProjects: ProjectImageEntry[] = [
 
 export const artProjects: ProjectImageEntry[] = [
   { href: "./art1.webp", id: "art1" },
-  { href: "./art8.webp", id: "art8" },
+  /*{ href: "./art8.webp", id: "art8" },*/
   /*{ href: "./art5.webp", id: "art5" },*/
   { href: "./art2.webp", id: "art2" },
-  { href: "./art11.webp", id: "art11" },
+  /*{ href: "./art11.webp", id: "art11" },*/
   /*{ href: "./art7.webp", id: "art7" },*/
   { href: "./art9.webp", id: "art9" },
 ];

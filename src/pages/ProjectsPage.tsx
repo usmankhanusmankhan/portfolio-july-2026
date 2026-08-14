@@ -161,6 +161,21 @@ const PROJECTS_FILTER_NONE = 'blur(0px)';
 const IMAGE_GAP = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 32 : 96; // horizontal spacing between images within a row
 const DEFAULT_IMAGE_DIMENSIONS = { width: 500, height: 500 };
 
+// The two case-study projects that sit behind a shared password. Entering
+// the password for either one unlocks both, for the rest of this browser
+// (persisted in localStorage). NOTE: this is a client-side gate meant to
+// keep casual visitors from stumbling into NDA'd case studies -- it's not
+// real security, since the password ships in the bundled JS. Swap in your
+// own password below.
+const PASSWORD_PROTECTED_IDS = new Set(['business-development-digest', 'ai-patterns']);
+const PASSWORD_PROTECTED_LINKS: Record<string, string> = {
+  'business-development-digest': '/bddigest',
+  'ai-patterns': '/aipatterns',
+};
+const CASE_STUDY_PASSWORD = 'usmankhandesigns';
+const CASE_STUDY_UNLOCK_STORAGE_KEY = 'usman-projects-unlocked';
+const CASE_STUDY_UNLOCKED_HOVER_TEXT = 'here we go!!!';
+
 type Viewport = { x: number; y: number };
 
 // Lays out a list of images left-to-right starting at (startX, topY).
@@ -347,9 +362,13 @@ const PROJECTS_LIST_HEADLINE =
 function ProjectsListView({
   images,
   onSelect,
+  unlockedCaseStudies,
+  onRequestCaseStudyAccess,
 }: {
   images: ListImage[];
   onSelect: (img: ListImage) => void;
+  unlockedCaseStudies: boolean;
+  onRequestCaseStudyAccess: (id: string, link: string) => void;
 }) {
   // NOTE: `images`/`onSelect` aren't wired into this markup yet — the cards
   // below are the ones ported over verbatim. Swap them out for a map over
@@ -649,7 +668,14 @@ function ProjectsListView({
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
                   >
-                    <div className="card" onClick={() => navigate('/bddigest')}>
+                    <div
+                      className="card"
+                      onClick={() =>
+                        unlockedCaseStudies
+                          ? navigate('/bddigest')
+                          : onRequestCaseStudyAccess('business-development-digest', '/bddigest')
+                      }
+                    >
                       <div className="card-image card-image-medium">
                         <img
                           src="./bd-digest-list.webp"
@@ -667,7 +693,14 @@ function ProjectsListView({
                         </div>
                       </div>
                     </div>
-                    <div className="card" onClick={() => navigate('/aipatterns')}>
+                    <div
+                      className="card"
+                      onClick={() =>
+                        unlockedCaseStudies
+                          ? navigate('/aipatterns')
+                          : onRequestCaseStudyAccess('ai-patterns', '/aipatterns')
+                      }
+                    >
                       <div className="card-image card-image-medium">
                         <img
                           src="./ai-patterns-list.webp"
@@ -753,19 +786,9 @@ function ProjectsListView({
                   <p>on play and its opposing pressures</p>
                 </div>
                 <div 
-                  onClick={() => navigate('/art/art8')} 
-                  className="writing-list-items">
-                  <p>on contradictions</p>
-                </div>
-                <div 
                   onClick={() => navigate('/art/art2')} 
                   className="writing-list-items">
                   <p>on defining the web</p>
-                </div>
-                <div 
-                  onClick={() => navigate('/art/art11')} 
-                  className="writing-list-items">
-                  <p>on tool overload</p>
                 </div>
                 <div 
                   onClick={() => navigate('/art/art9')} 
@@ -774,7 +797,7 @@ function ProjectsListView({
                 </div>
              </div> 
           </div>
-          <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.6', marginBottom: 'clamp(16px, 3.5vw, 24px)'}}>Some kind words from colleagues. Thanks guys!!</h1>
+          <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.6', marginBottom: 'clamp(16px, 3.5vw, 24px)'}}>Kind feedback from colleagues. Thanks guys!!</h1>
         </div>
       </div>
       <div className="carousel">
@@ -1419,15 +1442,80 @@ export default function ProjectsPage() {
   }, [viewMode, center]);
 
   
+  // Password gate for the two case-study projects (business-development-digest
+  // and ai-patterns). `unlockedCaseStudies` is persisted so a returning
+  // visitor who already entered the password doesn't get asked again, and
+  // entering it once unlocks both projects.
+  const [unlockedCaseStudies, setUnlockedCaseStudies] = React.useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem(CASE_STUDY_UNLOCK_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [passwordModalTarget, setPasswordModalTarget] = React.useState<{ id: string; link: string } | null>(null);
+  const [passwordInput, setPasswordInput] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState(false);
+
+  const requestCaseStudyAccess = React.useCallback((id: string, link: string) => {
+    setPasswordInput('');
+    setPasswordError(false);
+    setPasswordModalTarget({ id, link });
+  }, []);
+
+  const closePasswordModal = React.useCallback(() => {
+    setPasswordModalTarget(null);
+    setPasswordInput('');
+    setPasswordError(false);
+  }, []);
+
+  const navigateToTarget = React.useCallback(
+    (link: string) => {
+      if (/^https?:\/\//.test(link)) {
+        window.open(link, '_blank', 'noopener,noreferrer');
+      } else {
+        navigate(link);
+      }
+    },
+    [navigate]
+  );
+
+  const submitPassword = React.useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault();
+      if (passwordInput.trim().toLowerCase() === CASE_STUDY_PASSWORD.toLowerCase()) {
+        setUnlockedCaseStudies(true);
+        try {
+          window.localStorage.setItem(CASE_STUDY_UNLOCK_STORAGE_KEY, 'true');
+        } catch {
+          // localStorage unavailable (e.g. private browsing) -- the unlock
+          // just won't persist across reloads, which is fine.
+        }
+        const target = passwordModalTarget;
+        setPasswordModalTarget(null);
+        setPasswordInput('');
+        setPasswordError(false);
+        if (target) navigateToTarget(target.link);
+      } else {
+        setPasswordError(true);
+      }
+    },
+    [passwordInput, passwordModalTarget, navigateToTarget]
+  );
+
   const handleProjectSelect = React.useCallback(
     (img: { id: string; link?: string }) => {
+      if (PASSWORD_PROTECTED_IDS.has(img.id) && !unlockedCaseStudies) {
+        requestCaseStudyAccess(img.id, img.link ?? PASSWORD_PROTECTED_LINKS[img.id]);
+        return;
+      }
       if (img.link && /^https?:\/\//.test(img.link)) {
         window.open(img.link, '_blank', 'noopener,noreferrer');
       } else {
         navigate(img.link ?? `/art/${img.id}`);
       }
     },
-    [navigate]
+    [navigate, unlockedCaseStudies, requestCaseStudyAccess]
   );
 
   const [hoveredImage, setHoveredImage] = React.useState<string | null>(null);
@@ -1505,13 +1593,16 @@ export default function ProjectsPage() {
   // then artContent.json's title for that id, then the raw id.
   const hoveredPillText = React.useMemo(() => {
     if (!hoveredImage) return '';
+    if (PASSWORD_PROTECTED_IDS.has(hoveredImage) && unlockedCaseStudies) {
+      return CASE_STUDY_UNLOCKED_HOVER_TEXT;
+    }
     const hoveredEntry = images.find((img) => img.id === hoveredImage);
     return (
       hoveredEntry?.hoverText ??
       (artContent as Record<string, { title?: string }>)[hoveredImage]?.title ??
       hoveredImage
     );
-  }, [hoveredImage, images]);
+  }, [hoveredImage, images, unlockedCaseStudies]);
 
 
 
@@ -1546,7 +1637,13 @@ export default function ProjectsPage() {
       <BottomMenu viewMode={viewMode} onViewModeChange={handleViewModeChange} />
       <AnimatePresence mode="wait">
         {viewMode === 'list' && (
-          <ProjectsListView key="list" images={images} onSelect={handleProjectSelect} />
+          <ProjectsListView
+            key="list"
+            images={images}
+            onSelect={handleProjectSelect}
+            unlockedCaseStudies={unlockedCaseStudies}
+            onRequestCaseStudyAccess={requestCaseStudyAccess}
+          />
         )}
       </AnimatePresence>
       {viewMode === 'canvas' && (
@@ -1946,6 +2043,122 @@ export default function ProjectsPage() {
         <div style={{color: 'var(--color-text-subtle)'}}>{Math.floor(camera.z * 100)}%</div>
       </motion.div>
       </>
+      )}
+      {ReactDOM.createPortal(
+        <AnimatePresence>
+          {passwordModalTarget && (
+            <motion.div
+              key="password-modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              onClick={closePasswordModal}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 999999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+              }}
+            >
+              <motion.form
+                key="password-modal"
+                onClick={(e) => e.stopPropagation()}
+                onSubmit={submitPassword}
+                initial={{ opacity: 0, scale: 0.95, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.95, filter: 'blur(6px)' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                style={{
+                  width: 'min(360px, calc(100vw - 48px))',
+                  padding: 24,
+                  borderRadius: 12,
+                  border: '1px solid var(--color-stroke-muted)',
+                  background: 'var(--color-bg)',
+                  boxShadow: '0 8px 24px var(--color-modal-shadow)',
+                  fontFamily: '"AspektaVF", sans-serif',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 32
+,
+                }}
+              >
+                <div style={{ fontSize: 16, fontWeight: 500, textAlign: 'center', color: 'var(--color-text)' }}>
+                  Wait a second! This case study is password protected.
+                </div>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+                  <input
+                    type="password"
+                    autoFocus
+                    value={passwordInput}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      if (passwordError) setPasswordError(false);
+                    }}
+                    placeholder="Password"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: `1px solid ${passwordError ? '#e5484d' : 'var(--color-stroke-muted)'}`,
+                      background: 'var(--color-bg)',
+                      color: 'var(--color-text)',
+                      fontFamily: 'inherit',
+                      fontSize: 14,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  {passwordError && (
+                    <div style={{ fontSize: 12, textAlign: 'center', color: '#e5484d' }}>Incorrect password, try again.</div>
+                  )}
+                  <div style={{ display: 'flex', gap: 12, justifyContent: 'space-between', marginTop: 4 }}>
+                    <button
+                      type="button"
+                      onClick={closePasswordModal}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: 9999,
+                        border: '1px solid var(--color-stroke-muted)',
+                        background: 'transparent',
+                        color: 'var(--color-text)',
+                        fontFamily: 'inherit',
+                        fontSize: 14,
+                        cursor: 'pointer',
+                        width: '100%'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: 9999,
+                        border: 'none',
+                        background: 'var(--color-text)',
+                        color: 'var(--color-bg)',
+                        fontFamily: 'inherit',
+                        fontSize: 14,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        width: '100%'
+                      }}
+                    >
+                      Unlock
+                    </button>
+                  </div>
+                </div>
+              </motion.form>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </div>
   );
