@@ -216,6 +216,7 @@ export default function ArtDetail() {
                                 <span
                                     key={index}
                                     style={{
+                                        textWrap: 'pretty',
                                         fontWeight: segment.bold ? 500 : 300,
                                         fontSize: segment.bold ? 'clamp(12px, 3.5vw, 16px)' : 'clamp(12px, 3.5vw, 16px)',
                                         lineHeight: segment.bold ? 1.7 : 1.8,
