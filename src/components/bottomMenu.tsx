@@ -48,19 +48,8 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
             whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>
-            <div className={styles['logo-container']}>
-                <button
-                    onClick={() => navigate('/')}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        margin: 0,
-                        cursor: 'pointer'
-                    }}
-                >
-                    <img src="/logo.svg" alt="logo" height="32px" width="32px" style={{ display: 'block' }}/>
-                </button>
+            <div className={styles['name']}>
+                Usman Khan
             </div>
             {linksArray.map((link: Link) => (
                     <div key={link.href} className={styles['link']}>

@@ -77,7 +77,7 @@ export default function AiPatterns() {
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Team</p>
                         <p className={styles.body_role}>Myself</p>
-                        <p className={styles.body_role}>Design Lead</p>
+                        <p className={styles.body_role}>Design Systems Lead</p>
                     </div>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Timeline</p>
