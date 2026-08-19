@@ -21,15 +21,22 @@
     transform: none;
 }
 
+@media screen and (max-width: 600px) {
+    .name {
+        display: none !important;
+    }
+}
+
 .name {
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 23px;
     color: var(--color-text);
     font-weight: 500;
 }
+
 
 .menu-container {
     display: flex;
@@ -38,10 +45,12 @@
     gap: 12px;
 }
 
+
+
 .link a {
     font-size: 14px;
     line-height: 1.5;
-    color: var(--color-text-link);
+    color: var(--color-text-subtle);
     text-decoration: none;
     cursor: pointer;
 }
