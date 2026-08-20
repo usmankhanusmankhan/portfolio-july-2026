@@ -42,7 +42,7 @@ export const artProjects: ProjectImageEntry[] = [
   { href: "./art8.webp", id: "art8" },
   /*{ href: "./art5.webp", id: "art5" },*/
   { href: "./art2.webp", id: "art2" },
-  /*{ href: "./art11.webp", id: "art11" },*/
+  { href: "./art11.webp", id: "art11" },
   /*{ href: "./art7.webp", id: "art7" },*/
   { href: "./art9.webp", id: "art9" },
 ];

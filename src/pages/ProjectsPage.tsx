@@ -796,6 +796,11 @@ function ProjectsListView({
                   <p>on defining the web</p>
                 </div>
                 <div 
+                  onClick={() => navigate('/art/art11')} 
+                  className="writing-list-items">
+                  <p>on tool overload</p>
+                </div>
+                <div 
                   onClick={() => navigate('/art/art9')} 
                   className="writing-list-items">
                   <p>on gathering community</p>
