@@ -39,7 +39,7 @@ export const experimentalProjects: ProjectImageEntry[] = [
 
 export const artProjects: ProjectImageEntry[] = [
   { href: "./art1.webp", id: "art1" },
-  /*{ href: "./art8.webp", id: "art8" },*/
+  { href: "./art8.webp", id: "art8" },
   /*{ href: "./art5.webp", id: "art5" },*/
   { href: "./art2.webp", id: "art2" },
   /*{ href: "./art11.webp", id: "art11" },*/

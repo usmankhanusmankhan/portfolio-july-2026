@@ -785,6 +785,11 @@ function ProjectsListView({
                   className="writing-list-items">
                   <p>on play and its opposing pressures</p>
                 </div>
+                <div
+                  onClick={() => navigate('/art/art8')} 
+                  className="writing-list-items">
+                  <p>on contradictions</p>
+                </div>
                 <div 
                   onClick={() => navigate('/art/art2')} 
                   className="writing-list-items">
@@ -1682,7 +1687,6 @@ export default function ProjectsPage() {
           WebkitTouchCallout: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
-          
         }}
       >
         <defs>
