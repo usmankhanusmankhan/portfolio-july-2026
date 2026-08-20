@@ -1348,39 +1348,50 @@ export default function ProjectsPage() {
   // with a mouse's scroll wheel regardless of device — this only adds the
   // click-and-drag gesture, which wheel scrolling doesn't cover.
   //
-  // Bound to the middle mouse button rather than the left button —
-  // same as Figma. There's no reliable way to detect whether a physical
-  // mouse is plugged in (trackpad clicks and mouse clicks produce
-  // identical events), but trackpads generally have no middle-click
-  // gesture at all, so gating on button 1 naturally makes this
-  // unavailable on a trackpad-only laptop without needing to detect the
-  // device. It also means drag-panning can start from anywhere on the
-  // canvas, including on top of a project image, without interfering
-  // with that image's onClick — the DOM only fires `click` for the
-  // primary button, so a middle-button drag never triggers it.
+  // Bound to the primary (left) button only. Drag-panning can start from
+  // anywhere on the canvas, including on top of a project image, so a
+  // left-button drag needs to be told apart from a plain click on that
+  // image. We do that with a small movement threshold: the gesture isn't
+  // treated as a pan (and the grabbing cursor doesn't show) until the
+  // pointer has moved a few pixels. If it ever crosses that threshold,
+  // the upcoming `click` event on whatever's underneath is suppressed via
+  // a capturing listener, so the image's onClick doesn't also fire and
+  // navigate away.
   React.useEffect(() => {
     if (viewMode !== 'canvas') return;
 
     const svg = ref.current;
     if (!svg) return;
 
+    const DRAG_THRESHOLD = 4; // px of movement before a left-click counts as a pan
+
+    let isDown = false;
     let isPanning = false;
+    let didDrag = false;
+    let startPos: { x: number; y: number } | null = null;
     let lastPos: { x: number; y: number } | null = null;
 
     function handleMouseDown(e: MouseEvent) {
-      if (e.button !== 1) return;
+      if (e.button !== 0) return;
 
-      // Prevent the browser's native middle-click autoscroll mode
-      // (Windows/Linux) from also kicking in.
-      e.preventDefault();
-
-      isPanning = true;
-      lastPos = { x: e.clientX, y: e.clientY };
-      setIsPanningCursor(true);
+      isDown = true;
+      didDrag = false;
+      startPos = { x: e.clientX, y: e.clientY };
+      lastPos = startPos;
     }
 
     function handleMouseMove(e: MouseEvent) {
-      if (!isPanning || !lastPos) return;
+      if (!isDown || !lastPos || !startPos) return;
+
+      if (!isPanning) {
+        const totalDx = e.clientX - startPos.x;
+        const totalDy = e.clientY - startPos.y;
+        if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD) return;
+        isPanning = true;
+        setIsPanningCursor(true);
+      }
+
+      didDrag = true;
 
       const dx = e.clientX - lastPos.x;
       const dy = e.clientY - lastPos.y;
@@ -1391,20 +1402,35 @@ export default function ProjectsPage() {
     }
 
     function handleMouseUp(e: MouseEvent) {
-      if (e.button !== 1) return;
+      if (e.button !== 0) return;
+      isDown = false;
       isPanning = false;
+      startPos = null;
       lastPos = null;
       setIsPanningCursor(false);
+    }
+
+    // Capturing click listener: if the mouseup that just happened was
+    // the end of a drag-pan, swallow the resulting click before it
+    // reaches a project image's onClick (or any other handler).
+    function handleClickCapture(e: MouseEvent) {
+      if (didDrag) {
+        e.stopPropagation();
+        e.preventDefault();
+        didDrag = false;
+      }
     }
 
     svg.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
+    svg.addEventListener("click", handleClickCapture, true);
 
     return () => {
       svg.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+      svg.removeEventListener("click", handleClickCapture, true);
     };
   }, [viewMode]);
 
@@ -1656,7 +1682,7 @@ export default function ProjectsPage() {
           WebkitTouchCallout: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
-          cursor: isPanningCursor ? 'grabbing' : undefined,
+          
         }}
       >
         <defs>
