@@ -94,12 +94,7 @@ svg g {
 }
 
 /* Mobile optimizations */
-@media (max-width: 768px) {
-  .zoom-box {
-    bottom: 10px;
-    right: 10px;
-  }
-}
+
 
 /* Low-end device optimizations */
 @media (prefers-reduced-motion: no-preference) {

@@ -32,7 +32,7 @@
     justify-content: center;
     align-items: center;
     font-size: 14px;
-    line-height: 23px;
+    line-height: 1.5; /* match .link a */
     color: var(--color-text);
     font-weight: 500;
 }
@@ -53,6 +53,11 @@
     color: var(--color-text-subtle);
     text-decoration: none;
     cursor: pointer;
+}
+
+.link {
+    display: flex;
+    align-items: center;
 }
 
 .link-button {
