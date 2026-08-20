@@ -92,7 +92,7 @@
 .view-switcher-button {
     font-size: 14px;
     font-family: inherit;
-    color: var(--color-text-link);
+    color: var(--color-text-subtle);
     background: none;
     border: none;
     padding: 6px 14px;
