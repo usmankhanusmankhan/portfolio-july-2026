@@ -184,7 +184,6 @@ svg g {
   align-items: center;
   border-left: 1px solid var(--color-border);
   padding: 6px 6px 6px 12px;
-  color: var(--color-text-link);
   font-size: clamp(12px, 3.5vw, 16px);
   transition: all 0.1s ease-out;
 }
@@ -194,6 +193,16 @@ svg g {
   border-left: 1.5px solid var(--color-badge-coral);
   color: var(--color-badge-coral);
 }
+
+.writing-list-items a {
+  text-decoration: none;
+  color: var(--color-text-link);
+}
+
+.writing-list-items:hover a {
+  color: var(--color-badge-coral);
+}
+
 
 .carousel {
   margin: 96px auto;

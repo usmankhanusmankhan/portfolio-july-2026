@@ -668,8 +668,9 @@ function ProjectsListView({
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
                   >
-                    <div
+                    <button
                       className="card"
+                      style={{background: 'none', border: 'none', textAlign: 'left'}}
                       onClick={() =>
                         unlockedCaseStudies
                           ? navigate('/bddigest')
@@ -692,9 +693,10 @@ function ProjectsListView({
                           agentic platform, Celeste
                         </div>
                       </div>
-                    </div>
-                    <div
+                    </button>
+                    <button
                       className="card"
+                      style={{background: 'none', border: 'none', textAlign: 'left'}}
                       onClick={() =>
                         unlockedCaseStudies
                           ? navigate('/aipatterns')
@@ -716,8 +718,8 @@ function ProjectsListView({
                           Audited and refreshed the visual identity of AI branding within Intapp's products.
                         </div>
                       </div>
-                    </div>
-                    <div className="card" style={{cursor: 'default', transform: 'none'}}>
+                    </button>
+                    <div className="card" style={{cursor: 'default', transform: 'none'}} tabIndex={0}>
                       <div className="card-image card-image-medium">
                         <img
                           src="./embedded-celeste-list.webp"
@@ -745,8 +747,9 @@ function ProjectsListView({
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%' }}
                   >
-                    <div
+                    <button
                       className="card"
+                      style={{background: 'none', border: 'none', textAlign: 'left'}}
                       onClick={() =>
                         window.open(
                           'https://usmankhanusmankhan.github.io/reading-journal/',
@@ -754,7 +757,6 @@ function ProjectsListView({
                           'noopener,noreferrer'
                         )
                       }
-                      style={{ cursor: 'pointer' }}
                     >
                       <div className="card-image card-image-large">
                         <img
@@ -771,7 +773,7 @@ function ProjectsListView({
                           My thoughts on everything I've read this year, using Matter.js
                         </div>
                       </div>
-                    </div>
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -780,30 +782,35 @@ function ProjectsListView({
           <div style={{paddingTop: '16px'}}>
             <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.55', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology, creativity, design, and anything else that comes to mind.</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
+                <div 
+                  className="writing-list-items">
+                  <a href="./art/art1">
+                      on play and its opposing pressures
+                  </a>
+                </div>
                 <div
-                  onClick={() => navigate('/art/art1')} 
                   className="writing-list-items">
-                  <p>on play and its opposing pressures</p>
-                </div>
-                <div
-                  onClick={() => navigate('/art/art8')} 
-                  className="writing-list-items">
-                  <p>on contradictions</p>
+                  <a href="./art/art8">
+                    on contradictions
+                  </a>
                 </div>
                 <div 
-                  onClick={() => navigate('/art/art2')} 
                   className="writing-list-items">
-                  <p>on defining the web</p>
+                  <a href="./art/art2">
+                    on defining the web
+                  </a>
                 </div>
                 <div 
-                  onClick={() => navigate('/art/art11')} 
                   className="writing-list-items">
-                  <p>on tool overload</p>
+                  <a href="./art/art11">
+                    on tool overload
+                  </a>
                 </div>
                 <div 
-                  onClick={() => navigate('/art/art9')} 
                   className="writing-list-items">
-                  <p>on gathering community</p>
+                  <a href="./art/art9">
+                      on gathering community
+                  </a>
                 </div>
              </div> 
           </div>
