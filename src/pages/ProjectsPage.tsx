@@ -265,8 +265,8 @@ function CategoryDropdown({
       ref={containerRef}
       style={{
         position: 'fixed',
-        bottom: 12,
-        right: 12,
+        bottom: 16,
+        left: 16,
         zIndex: 500,
         fontFamily: '"AspektaVF", sans-serif',
       }}
@@ -2059,30 +2059,30 @@ export default function ProjectsPage() {
         whileInView={{opacity: 1, scale: 1, filter: "blur(0px)"}}
         transition={{duration: 0.4, delay: 1.2}}
       >
-        <div style={{ marginBottom: 8 }}>
+        
+        <div>
           <button
             className="zoom-button"
-            style={{ position: 'relative', marginRight: 4 }}
+            style={{ position: 'relative', marginRight: 6, border: 'none'}}
             onClick={() => setCamera((camera) => zoomIn(camera, center))}
           >
             +
           </button>
           <button
             className="zoom-button"
-            style={{ position: 'relative', marginRight: 4 }}
+            style={{ position: 'relative', marginRight: 6}}
             onClick={() => setCamera(resetCamera)}
           >
             Reset
           </button>
           <button
             className="zoom-button"
-            style={{ position: 'relative' }}
+            style={{ position: 'relative', border: 'none'}}
             onClick={() => setCamera((camera) => zoomOut(camera, center))}
           >
             -
           </button>
         </div>
-        <div style={{color: 'var(--color-text-subtle)'}}>{Math.floor(camera.z * 100)}%</div>
       </motion.div>
       </>
       )}
