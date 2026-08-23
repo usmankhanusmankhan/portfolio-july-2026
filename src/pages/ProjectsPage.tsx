@@ -312,7 +312,7 @@ function CategoryDropdown({
               padding: 6,
               position: 'absolute',
               bottom: 'calc(100% + 8px)',
-              right: 0,
+              left: 0,
               minWidth: 180,
               borderRadius: 16,
               border: '1px solid var(--color-stroke-muted)',
@@ -783,32 +783,57 @@ function ProjectsListView({
             <h1 style={{fontSize: 'clamp(14px, 3.5vw, 18px)', fontWeight: 500, lineHeight: '1.55', marginBottom: '24px'}}>On the side, I combine digital art with my thoughts on technology, creativity, design, and anything else that comes to mind.</h1>
             <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
                 <div 
-                  className="writing-list-items">
-                  <a href="./art/art1">
+                  className="writing-list-items"> 
+                  <a 
+                    href="./art/art1"
+                    onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/art/art1');
+                    }}>
                       on play and its opposing pressures
                   </a>
                 </div>
                 <div
                   className="writing-list-items">
-                  <a href="./art/art8">
+                  <a 
+                  href="./art/art8"
+                  onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/art/art8');
+                  }}>
                     on contradictions
                   </a>
                 </div>
                 <div 
                   className="writing-list-items">
-                  <a href="./art/art2">
+                  <a 
+                    href="./art/art2"
+                    onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/art/art2');
+                  }}>
                     on defining the web
                   </a>
                 </div>
                 <div 
                   className="writing-list-items">
-                  <a href="./art/art11">
+                  <a 
+                    href="./art/art11"
+                    onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/art/art11');
+                  }}>
                     on tool overload
                   </a>
                 </div>
                 <div 
                   className="writing-list-items">
-                  <a href="./art/art9">
+                  <a 
+                    href="./art/art9"
+                    onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/art/art9');
+                  }}>
                       on gathering community
                   </a>
                 </div>
