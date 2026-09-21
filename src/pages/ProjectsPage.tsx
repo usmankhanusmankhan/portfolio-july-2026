@@ -265,8 +265,8 @@ function CategoryDropdown({
       ref={containerRef}
       style={{
         position: 'fixed',
-        bottom: 16,
-        left: 16,
+        top: 71,
+        left: 20,
         zIndex: 500,
         fontFamily: '"AspektaVF", sans-serif',
       }}
@@ -283,7 +283,7 @@ function CategoryDropdown({
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          padding: '8px 14px',
+          padding: '20px',
           margin: 0,
           borderRadius: 9999,
           border: '1px solid var(--color-stroke-muted)',
@@ -296,7 +296,11 @@ function CategoryDropdown({
           boxShadow: '0 2px 8px var(--color-modal-shadow)',
         }}
       >
-        <span>{selected.label}</span>
+        <span>
+          <svg style={{padding: '8px'}} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+            <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m2.75 12.25h10m-10-4h10m-10-4h10" />
+          </svg>
+        </span>
       </motion.button>
       <AnimatePresence>
         {isOpen && (
@@ -311,7 +315,7 @@ function CategoryDropdown({
               margin: '8px 0 0',
               padding: 6,
               position: 'absolute',
-              bottom: 'calc(100% + 8px)',
+              top: 'calc(100% + 4px)',
               left: 0,
               minWidth: 180,
               borderRadius: 16,
@@ -2085,13 +2089,13 @@ export default function ProjectsPage() {
         transition={{duration: 0.4, delay: 1.2}}
       >
         
-        <div>
+        
           <button
             className="zoom-button"
             style={{ position: 'relative', marginRight: 6, border: 'none'}}
-            onClick={() => setCamera((camera) => zoomIn(camera, center))}
+            onClick={() => setCamera((camera) => zoomOut(camera, center))}
           >
-            +
+            -
           </button>
           <button
             className="zoom-button"
@@ -2103,11 +2107,11 @@ export default function ProjectsPage() {
           <button
             className="zoom-button"
             style={{ position: 'relative', border: 'none'}}
-            onClick={() => setCamera((camera) => zoomOut(camera, center))}
+            onClick={() => setCamera((camera) => zoomIn(camera, center))}
           >
-            -
+            +
           </button>
-        </div>
+        
       </motion.div>
       </>
       )}
