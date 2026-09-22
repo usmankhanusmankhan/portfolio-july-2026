@@ -297,9 +297,12 @@ function CategoryDropdown({
         }}
       >
         <span>
-          <svg style={{padding: '10px'}} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+          <motion.svg style={{padding: '10px'}} animate={{ opacity: isOpen ? 0 : 1, rotate: isOpen ? 45 : 0, scale: isOpen ? 0.75 : 1, filter: isOpen ? 'blur(4px)' : 'blur(0px)'}} transition={{ duration: 0.25, ease: 'easeInOut' }} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
             <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m2.75 12.25h10m-10-4h10m-10-4h10" />
-          </svg>
+          </motion.svg>
+          <motion.svg style={{padding: '10px'}} animate={{ opacity: isOpen ? 1 : 0, rotate: isOpen ? 0 : -45, scale: isOpen ? 1 : 0.75, filter: isOpen ? 'blur(0px)' : 'blur(4px)'}} transition={{ duration: 0.25, ease: 'easeInOut' }} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+            <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M4 4l8 8m0-8l-8 8" />
+          </motion.svg>
         </span>
       </motion.button>
       <AnimatePresence>
