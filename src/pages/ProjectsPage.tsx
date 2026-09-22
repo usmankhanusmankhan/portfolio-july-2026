@@ -297,7 +297,7 @@ function CategoryDropdown({
         }}
       >
         <span>
-          <svg style={{padding: '8px'}} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+          <svg style={{padding: '10px'}} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
             <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m2.75 12.25h10m-10-4h10m-10-4h10" />
           </svg>
         </span>
