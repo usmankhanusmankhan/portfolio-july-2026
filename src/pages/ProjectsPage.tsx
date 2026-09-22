@@ -648,6 +648,7 @@ function ProjectsListView({
               </button>
             </motion.div>
             <motion.div
+              layout
               initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
               animate={{
                 opacity: headerAnimationDone ? 1 : 0,
@@ -661,7 +662,6 @@ function ProjectsListView({
                 gap: 16,
                 width: '100%',
                 position: 'relative',
-                minHeight: 200,
               }}
               className="cards-grid cards-grid-single"
             >
