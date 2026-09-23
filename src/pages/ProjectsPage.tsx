@@ -275,7 +275,7 @@ function CategoryDropdown({
         type="button"
         initial={{ opacity: 0, filter: 'blur(4px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
-        transition={{duration: 0.4, delay: 1.2}}
+        transition={{duration: 0.4, delay: 1.65}}
         onClick={() => setIsOpen((open) => !open)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -309,7 +309,7 @@ function CategoryDropdown({
         {isOpen && (
           <motion.ul
             role="listbox"
-            initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+            initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
             transition={{ duration: 0.15, ease: 'easeInOut' }}
@@ -669,10 +669,7 @@ function ProjectsListView({
                 {projectsTab === 'selected' && (
                   <motion.div
                     key="selected"
-                    initial={{ opacity: 0, filter: 'blur(5px)' }}
-                    animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(5px)' }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                    
                     style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
                   >
                     <button
@@ -748,10 +745,7 @@ function ProjectsListView({
                 {projectsTab === 'experiments' && (
                   <motion.div
                     key="experiments"
-                    initial={{ opacity: 0, filter: 'blur(5px)' }}
-                    animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(5px)' }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                    
                     style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%' }}
                   >
                     <button
@@ -2089,30 +2083,14 @@ export default function ProjectsPage() {
         className="zoom-box"
         initial={{opacity: 0, scale: 0.95, filter: "blur(6px)"}}
         whileInView={{opacity: 1, scale: 1, filter: "blur(0px)"}}
-        transition={{duration: 0.4, delay: 1.2}}
+        transition={{duration: 0.4, delay: 1.5}}
       >
-        
-        
           <button
             className="zoom-button"
-            style={{ position: 'relative', marginRight: 6, border: 'none'}}
-            onClick={() => setCamera((camera) => zoomOut(camera, center))}
-          >
-            -
-          </button>
-          <button
-            className="zoom-button"
-            style={{ position: 'relative', marginRight: 6}}
+            style={{ position: 'relative'}}
             onClick={() => setCamera(resetCamera)}
           >
             Reset
-          </button>
-          <button
-            className="zoom-button"
-            style={{ position: 'relative', border: 'none'}}
-            onClick={() => setCamera((camera) => zoomIn(camera, center))}
-          >
-            +
           </button>
         
       </motion.div>
