@@ -38,8 +38,10 @@ export default function BusinessDevelopmentDigest() {
                     <a className={styles.nav_link} href="#overview">Overview</a>
                     <a className={styles.nav_link} href="#solution">Solution</a>
                     <a className={styles.nav_link} href="#pain-points">Pain points</a>
-                    <a className={styles.nav_link} href="#prototyping">Prototyping</a>
+                    <a className={styles.nav_link} href="#first-pass">First pass</a>
                     <a className={styles.nav_link} href="#feature-set">Feature set</a>
+                    <a className={styles.nav_link} href="#prototyping">Prototyping</a>
+                    <a className={styles.nav_link} href="#learnings">Learnings</a>
                 </div>
 
             </div>
@@ -126,12 +128,13 @@ export default function BusinessDevelopmentDigest() {
                         </div>
                     </div>
                 </div>
-                <div id="prototyping" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
-                    <h1 className={styles.title_main}>Cursor and Claude allowed me to rapidly prototype interactions that got the team quickly excited</h1>
-                    <p className={styles.body_main}>Working closer to the code has not only helped dramatically cut down implementation time for devs, but also showcase animations and motion that communicate my vision to PMs and Devs a lot better than Figma. Typing interactions, like the one shown below, would have been much more time consuming to create in Figma.</p>
-                    <video className={styles.case_study_video} autoPlay loop muted playsInline>
-                        <source src="./claude-cursor-exciting.webm" type="video/webm"/>
+                <div id="first-pass" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
+                    <h1 className={styles.title_main}>My first pass had a list of Signals similar to our legacy offering, but this didn't feel conversational or approachable</h1>
+                    <p className={styles.body_main} style={{marginBottom: "16px"}}>The card interaction of 'reviewing playbook' was adherent to the rest of the Celeste design system for activating playbooks in conversation. However, to the rest of the team, this felt too similar to the legacy experience that we had in the past. It also overwhelmed the user with notification-like information upfront. How could we center what was most important and reveal more through progressive disclosure?</p>
+                    <video className={styles.case_study_video} style={{marginBottom: "32px"}} autoPlay loop muted playsInline>
+                        <source src="./first-pass-activator-playbook.webm" type="video/webm"/>
                     </video>
+                    <p className={styles.body_main} style={{marginBottom: "24px"}}>As a result, I proposed a change to the first elements generated when activating the digest. We would lead with an important opportunity that the lawyer action, centering the most important opportunity for them with the little time that they had.</p>
                 </div>
                 <div id="feature-set" style={{marginBottom: "clamp(40px, 10vw, 80px)"}}>
                     <p className={styles.body_main} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "clamp(12px, 4vw, 14px)"}}>Feature Set</p>
@@ -154,6 +157,13 @@ export default function BusinessDevelopmentDigest() {
                     <p className={styles.body_main}>In our previous system with low adoption rates, we were giving each lawyer every opportunity one-by-one. In a new agentic world, we could shorten the workflow by grouping together multiple actions while allowing the LLM to still give context on why the options were there.</p>
                     <img src="./bulk-actionability.webp" style={{width: "100%", height: "auto", borderRadius: "16px"}}></img>
                 </div> 
+                <div id="prototyping" style={{marginBottom: "clamp(32px, 10vw, 64px)", paddingBottom: "clamp(32px, 10vw, 64px)", borderBottom: "1px solid #E1EED3"}}>
+                    <h1 className={styles.title_main}>Cursor and Claude allowed me to rapidly prototype interactions that got the team quickly excited</h1>
+                    <p className={styles.body_main}>Working closer to the code has not only helped dramatically cut down implementation time for devs, but also showcase animations and motion that communicate my vision to PMs and Devs a lot better than Figma. Typing interactions, like the one shown below, would have been much more time consuming to create in Figma.</p>
+                    <video className={styles.case_study_video} autoPlay loop muted playsInline>
+                        <source src="./claude-cursor-exciting.webm" type="video/webm"/>
+                    </video>
+                </div>
                 <div id="learnings" style={{marginBottom: "clamp(48px, 10vw, 96px)"}}>
                     <h1 className={styles.title_main}>If I were to do it again, I’d meet the lawyers where they live in Outlook</h1>
                     <p className={styles.body_main}>Another tidbit of historical knowledge: we know that lawyers live in existing platforms like Outlook. We knew that placing the solution in our agentic platform would take them away from the famiilar workflow.  In the future, I would recreate the digest within Outlook to be easily actionable in their everyday areas.</p>
