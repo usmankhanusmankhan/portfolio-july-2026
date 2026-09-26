@@ -47,7 +47,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
             initial={{ y: -50}}
             whileInView={{ y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 1.2, type: 'spring', stiffness: 150 }}>
+            transition={{ duration: 0.4, delay: 1, type: 'spring', stiffness: 100 }}>
             <div className={styles['name']}>
                 Usman Khan
             </div>

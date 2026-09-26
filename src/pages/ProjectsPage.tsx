@@ -1,7 +1,7 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { useNavigate, useBlocker, useSearchParams, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
 import BottomMenu from '../components/bottomMenu';
 import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
 import { imageConfig, ImageConfig } from '../config/imageConfig';
@@ -933,6 +933,391 @@ function ProjectsListView({
   );
 }
 
+// A little car that drives left-to-right along the top edge of a target
+// box (usmanIntro), then drives off the right edge and tips over into a
+// fall. Lives in world-space coordinates, so it inherits the camera's
+// pan/zoom for free just by sitting inside the same transformed <g> as
+// everything else.
+//
+// Uses car-sprite.svg for the artwork. If you swap in a different asset,
+// see the CAR_WIDTH/CAR_HEIGHT/WHEEL_CONTACT_Y_LOCAL comment below for what
+// needs to be re-measured to keep the wheels aligned with the top edge.
+// Builds a speech-bubble outline: rounded on three corners, square on the
+// bottom-left — same pill silhouette as HoveredPill, but the sharp corner
+// doubles as the "tail" pointing back down toward whatever it's attached to,
+// without needing a separate triangle path.
+function speechBubblePath(width: number, height: number, radius: number): string {
+  const r = Math.min(radius, width / 2, height / 2);
+  return `M ${r} 0 L ${width - r} 0 A ${r} ${r} 0 0 1 ${width} ${r} L ${width} ${height - r} A ${r} ${r} 0 0 1 ${width - r} ${height} L 0 ${height} L 0 ${r} A ${r} ${r} 0 0 1 ${r} 0 Z`;
+}
+
+// One phrase's bubble: measures its own text width and fades in/out on
+// mount/unmount. The parent below swaps which phrase is mounted (via
+// AnimatePresence + a changing key), so every phrase change gets this fade
+// for free rather than needing to hand-roll per-phrase opacity keyframes.
+function SpeechBubbleContent({
+  text,
+  x,
+  y,
+  isWarning = false,
+  isSuccess = false,
+}: {
+  text: string;
+  x: number;
+  y: number;
+  isWarning?: boolean;
+  isSuccess?: boolean;
+}) {
+  const BUBBLE_HEIGHT = 24;
+  const BUBBLE_PADDING_X = 8;
+  const BUBBLE_RADIUS = 10;
+
+  const textRef = React.useRef<SVGTextElement>(null);
+  const [textWidth, setTextWidth] = React.useState(() => text.length * 7); // rough estimate until measured
+  React.useLayoutEffect(() => {
+    if (textRef.current) setTextWidth(textRef.current.getComputedTextLength());
+  }, [text]);
+  const bubbleWidth = textWidth + BUBBLE_PADDING_X * 2;
+
+  return (
+    // Position (x, y) and opacity are both owned by this ONE motion.g now —
+    // previously position lived on a separate plain <g> one level up while
+    // opacity/scale lived here, and that split turned out to be exactly
+    // what was preventing position edits from visibly taking effect.
+    // Everything the bubble needs now lives on a single element.
+    <motion.g
+      initial={{ opacity: 0, x, y }}
+      animate={{ opacity: 1, x, y }}
+      exit={{ opacity: 0, x, y }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+    >
+      <path
+        d={speechBubblePath(bubbleWidth, BUBBLE_HEIGHT, BUBBLE_RADIUS)}
+        // #e5484d matches the existing error-state red used for the password
+        // field elsewhere in this file; #30a46c is that same palette's green.
+        fill={isWarning ? 'oklch(0.6265 0.2408 22.98)' : isSuccess ? 'oklch(0.6383 0.1496 157.68)' : 'var(--color-accent)'}
+        style={{ filter: 'drop-shadow(0 2px 8px var(--color-modal-shadow))' }}
+      />
+      <text
+        ref={textRef}
+        x={bubbleWidth / 2}
+        y={BUBBLE_HEIGHT / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        style={{
+          fontFamily: '"AspektaVF", sans-serif',
+          fontSize: 12,
+          fill: isWarning || isSuccess ? 'oklch(1 0 0)' : 'var(--color-bg)',
+        }}
+      >
+        {text}
+      </text>
+    </motion.g>
+  );
+}
+
+// Module-level, not inline as a default parameter: a default array literal
+// in a function signature is a NEW array every call (JS re-evaluates default
+// expressions per invocation), which broke the cycling effect's dependency
+// array below — it saw a "changed" `phrases` on every render (even though
+// the contents were identical) and kept tearing down/restarting the
+// interval. Panning/zooming re-renders this component on every pointer move
+// via setCamera, so the interval never survived long enough to fire. A
+// stable module-level reference fixes that.
+const DEFAULT_SPRITE_CAR_PHRASES = ["don't mind me, just cruising along...", 'hm the edge is getting closer...', 'ok this might be bad!', "ok this is for sure bad!!!", "uh guys?? GUYS???", "AHHHH!!!!"];
+
+interface SpriteCarProps {
+  target: { x: number; y: number; width: number; height: number };
+  reducedMotion: boolean;
+  phrases?: string[];
+  phraseDuration?: number; // seconds each phrase stays up before the next one swaps in
+}
+
+function SpriteCar({
+  target,
+  reducedMotion,
+  phrases = DEFAULT_SPRITE_CAR_PHRASES,
+  phraseDuration = 2.5,
+}: SpriteCarProps) {
+  if (reducedMotion) return null;
+
+  const [phraseIndex, setPhraseIndex] = React.useState(0);
+
+  // CAR_WIDTH/CAR_HEIGHT must match car-sprite.svg's viewBox exactly
+  // (viewBox="0 0 60 24") — that's what preserveAspectRatio scales against.
+  //
+  // WHEEL_CONTACT_Y_LOCAL is the one number that has to be re-measured any
+  // time the art changes: it's the y-coordinate, in the artwork's own
+  // coordinate space (0 at the top of the viewBox, CAR_HEIGHT at the
+  // bottom), where the wheels actually touch the ground. For car-sprite.svg,
+  // both wheel circles' bottom edges land at roughly y=23.8-24 — i.e. flush
+  // with the bottom of the viewBox — so it's just CAR_HEIGHT here. If you
+  // swap in art with a wheel-well margin below the tires, or the car sitting
+  // higher in its own canvas, open the SVG and find where the wheels'
+  // contact points actually fall and use that instead.
+  const CAR_WIDTH = 60;
+  const CAR_HEIGHT = 24;
+  const WHEEL_CONTACT_Y_LOCAL = CAR_HEIGHT;
+
+  const START_POSITION_ADJUST_X = 64;
+  const POSITION_ADJUST_Y = 0;
+  const rideY = target.y - POSITION_ADJUST_Y - (WHEEL_CONTACT_Y_LOCAL - CAR_HEIGHT / 2);
+  const startX = target.x + target.width + CAR_WIDTH / 2 - START_POSITION_ADJUST_X;
+  const edgeX = (target.x - CAR_WIDTH / 2) + 8;
+  const fallY = rideY + 500; // well past the bottom of the thumbnail
+
+  const DRIVE_DURATION = 13;  // right edge -> left edge
+  const FALL_DURATION = 2.8;
+  // fallX is derived from the drive's own speed, not a hand-picked distance:
+  // it continues at exactly the same horizontal velocity the car was driving
+  // at when it went over the edge. Combined with giving x its own 'linear'
+  // easing for both segments below (rather than sharing y's 'easeIn'), this
+  // is what actually conserves momentum through the transition — a
+  // mismatched distance/speed here is what previously read as the car
+  // stopping dead in midair before falling.
+  const driveVelocityX = (edgeX - startX) / DRIVE_DURATION;
+  const fallX = edgeX + driveVelocityX * FALL_DURATION;
+  const totalDuration = DRIVE_DURATION + FALL_DURATION;
+  const t1 = DRIVE_DURATION / totalDuration;
+
+  // Held back a few seconds after page load so the car isn't competing with
+  // everything else fading/settling in. `delay` only applies once, before the
+  // first pass — it doesn't get re-added on every drive/fall loop.
+  const START_DELAY = 1.75;
+
+  // Shared with the `default`/`opacity`/inner-rotate transitions below, so
+  // the phrase-reset timer (which can't rely on Framer Motion's onComplete —
+  // see below) can stay in lockstep with the actual drive/fall cadence.
+  const REPEAT_DELAY = 4;
+
+  // Seconds into each drive before the bubble shows up and starts cycling —
+  // the car drives a little while first before it starts "talking."
+  const BUBBLE_START_DELAY = 0.77;
+
+  const [bubbleActive, setBubbleActive] = React.useState(false);
+
+  // isStopped: true once the car's been clicked mid-drive and permanently
+  // frozen. isClickable: only true for the [DRIVE_DURATION / 2, DRIVE_DURATION)
+  // window of each lap — before that it hasn't driven far enough to "rescue,"
+  // and from DRIVE_DURATION onward it's already tipping into its fall.
+  // rescueMessage overrides whatever phrase is showing once clicked, and
+  // (unlike the normal cycle) never gets cleared.
+  const [isStopped, setIsStopped] = React.useState(false);
+  const [isClickable, setIsClickable] = React.useState(false);
+  const [rescueMessage, setRescueMessage] = React.useState<string | null>(null);
+
+  // Drives the bubble's per-lap show/hide and the click-eligibility window,
+  // timed against the same START_DELAY / totalDuration / REPEAT_DELAY
+  // cadence the drive/fall animation below uses (Framer Motion's
+  // onAnimationComplete isn't reliably called for repeat: Infinity
+  // animations, so this uses its own timers rather than hooking into it).
+  // Bails out entirely once isStopped — including clearing any timers still
+  // pending from the lap that was in progress at the moment of the click —
+  // so a rescued car doesn't have a stray "hide bubble" or "disable
+  // clickability" timeout land on top of the permanent rescue state.
+  React.useEffect(() => {
+    if (isStopped) return;
+
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const loopPeriod = totalDuration + REPEAT_DELAY;
+
+    const scheduleLap = (lapStartDelay: number) => {
+      timeouts.push(setTimeout(() => {
+        setPhraseIndex(0);
+        setBubbleActive(true);
+      }, (lapStartDelay + BUBBLE_START_DELAY) * 1000));
+
+      timeouts.push(setTimeout(() => {
+        setIsClickable(true);
+      }, (lapStartDelay + DRIVE_DURATION / 2) * 1000));
+
+      timeouts.push(setTimeout(() => {
+        // Driving's over and the fall is starting — no more rescuing it.
+        setIsClickable(false);
+      }, (lapStartDelay + DRIVE_DURATION) * 1000));
+
+      timeouts.push(setTimeout(() => {
+        setBubbleActive(false);
+      }, (lapStartDelay + totalDuration) * 1000));
+
+      timeouts.push(setTimeout(() => {
+        scheduleLap(0); // timers below are relative to "now", so 0 is correct here
+      }, (lapStartDelay + loopPeriod) * 1000));
+    };
+
+    scheduleLap(START_DELAY);
+    return () => timeouts.forEach(clearTimeout);
+  }, [totalDuration, isStopped]);
+
+  // Cycles through `phrases` on a timer, independent of the drive/fall
+  // animation's own timeline — but only while the bubble is actually shown,
+  // and never once a rescueMessage takes over.
+  React.useEffect(() => {
+    if (!bubbleActive || phrases.length <= 1 || rescueMessage) return;
+    const interval = setInterval(() => {
+      setPhraseIndex((i) => (i + 1) % phrases.length);
+    }, phraseDuration * 1000);
+    return () => clearInterval(interval);
+  }, [phrases, phraseDuration, bubbleActive, rescueMessage]);
+
+  // Opacity keyframes as fractions of totalDuration: fade in right after the
+  // loop starts, hold at full opacity through the drive and most of the fall,
+  // then fade out over the last FADE_OUT_DURATION seconds of the fall so the
+  // car doesn't just vanish once it's off-screen. Because this shares the
+  // same duration/delay/repeat/repeatDelay as the drive/fall loop below, it
+  // fades back in right as each new lap begins.
+  const FADE_IN_DURATION = 0.4;
+  const FADE_OUT_DURATION = 0.4;
+  const opacityTimes = [
+    0,
+    FADE_IN_DURATION / totalDuration,
+    (totalDuration - FADE_OUT_DURATION) / totalDuration,
+    1,
+  ];
+
+  // Imperative animation controls for the outer (position) group — needed so
+  // a click mid-drive can call controls.stop(), which freezes x/y/opacity
+  // exactly wherever they currently are. A declarative `animate={{...}}`
+  // target can't do that, since it doesn't know the in-flight interpolated
+  // position at an arbitrary click time.
+  const controls = useAnimationControls();
+
+  React.useEffect(() => {
+    if (isStopped) return;
+    controls.start({
+      opacity: [0, 1, 1, 0],
+      x: [startX, edgeX, fallX],
+      y: [rideY, rideY, fallY],
+      transition: {
+        // x deliberately does NOT share y's easing: 'linear' across both
+        // segments keeps horizontal velocity constant the whole way through
+        // (matching fallX's derivation above), so there's no deceleration
+        // blip right at the edge.
+        x: {
+          duration: totalDuration,
+          times: [0, t1, 1],
+          ease: ['linear', 'linear'],
+          repeat: Infinity,
+          repeatDelay: REPEAT_DELAY,
+          delay: START_DELAY,
+        },
+        // y stays flat (vy = 0) for the whole drive, then accelerates via
+        // 'easeIn' once the fall starts — this is the one axis that SHOULD
+        // start slow and speed up, mimicking gravity.
+        y: {
+          duration: totalDuration,
+          times: [0, t1, 1],
+          ease: ['linear', 'easeIn'],
+          repeat: Infinity,
+          repeatDelay: REPEAT_DELAY,
+          delay: START_DELAY,
+        },
+        opacity: {
+          times: opacityTimes,
+          duration: totalDuration,
+          ease: ['easeOut', 'linear', 'easeIn'],
+          repeat: Infinity,
+          repeatDelay: REPEAT_DELAY,
+          delay: START_DELAY,
+        },
+      },
+    });
+    return () => controls.stop();
+  }, [controls, isStopped]);
+
+  const handleCarClick = () => {
+    if (!isClickable || isStopped) return;
+    setIsStopped(true);
+    setIsClickable(false);
+    setBubbleActive(true);
+    setRescueMessage('omg thanks that was close!');
+    controls.stop(); // freezes position/opacity exactly where they are
+  };
+
+  // Speech bubble anchor — same tuning pattern as the car's own
+  // POSITION_ADJUST_X/Y and START_POSITION_ADJUST_X above: plain pixel
+  // nudges from the car's bounding-box corner (CAR_WIDTH / 2, -CAR_HEIGHT / 2),
+  // not raw SVG path coordinates. This is the pair to play with directly:
+  //   BUBBLE_OFFSET_X: bigger = further right, smaller/negative = further left
+  //   BUBBLE_OFFSET_Y: more negative = further up, less negative/positive = further down
+  // (SVG y grows downward, so "up" is a more negative number here.)
+  const BUBBLE_HEIGHT = 24; // must match the value inside SpeechBubbleContent
+  const BUBBLE_OFFSET_X = 4;
+  const BUBBLE_OFFSET_Y = -4;
+  const bubbleAnchorX = CAR_WIDTH / 2 + BUBBLE_OFFSET_X;
+  const bubbleAnchorY = -CAR_HEIGHT / 2 + BUBBLE_OFFSET_Y;
+
+  return (
+    // Outer group: position + opacity only, shared by the car art and the
+    // speech bubble. Deliberately does NOT carry rotate/scaleX, so the
+    // bubble (and its text) stay upright and readable even while the inner
+    // group below tips the car over into its fall.
+    <motion.g
+      style={{ pointerEvents: 'none' }}
+      initial={{ x: startX, y: rideY, opacity: 0 }}
+      // Plays when AnimatePresence removes this instance — e.g. a category
+      // switch or Reset click changes the key above. Its own transition is
+      // deliberately quick and independent of the drive/fall timing.
+      exit={{ opacity: 0, scale: 0.75, filter: 'blur(5px)', transition: { duration: 0.25, ease: 'easeIn' } }}
+      // Driven imperatively via `controls` (started in the effect above)
+      // rather than a declarative target, so a mid-drive click can call
+      // controls.stop() and freeze x/y/opacity exactly where they are.
+      animate={controls}
+    >
+      {/* Inner group: just the tipping-over rotation + facing-direction flip,
+          scoped to the car art so it doesn't drag the bubble along with it.
+          Switches to a static target once stopped — safe to do declaratively
+          here (unlike the outer group) because a click is only ever
+          accepted before DRIVE_DURATION, i.e. before this group's rotate
+          keyframes have started moving away from 0. */}
+      <motion.g
+        initial={{ rotate: 0, scaleX: -1 }}
+        animate={isStopped ? { rotate: 0, scaleX: -1 } : { rotate: [0, 0, 110], scaleX: -1 }}
+        transition={
+          isStopped
+            ? { duration: 0.2 }
+            : {
+                duration: totalDuration,
+                times: [0, t1, 1],
+                ease: ['linear', 'easeIn'],
+                repeat: Infinity,
+                repeatDelay: REPEAT_DELAY,
+                delay: START_DELAY,
+              }
+        }
+      >
+        <image
+          href="/car-sprite.svg"     // or an imported asset, or an inline .svg's path data
+          x={-CAR_WIDTH / 2}
+          y={-CAR_HEIGHT / 2}
+          width={CAR_WIDTH}
+          height={CAR_HEIGHT}
+          preserveAspectRatio="xMidYMid meet"
+          onClick={handleCarClick}
+          // The outer group is pointer-events: none so it doesn't block
+          // clicks elsewhere on the canvas; this explicit override on the
+          // image itself is what actually makes just the car clickable,
+          // and only during the isClickable window.
+          style={{ pointerEvents: isClickable ? 'auto' : 'none', cursor: isClickable ? 'pointer' : undefined }}
+        />
+      </motion.g>
+
+      <AnimatePresence mode="wait">
+        {bubbleActive && (
+          <SpeechBubbleContent
+            key={rescueMessage ?? phraseIndex}
+            text={rescueMessage ?? phrases[phraseIndex]}
+            x={bubbleAnchorX}
+            y={bubbleAnchorY - BUBBLE_HEIGHT}
+            isWarning={!rescueMessage && phraseIndex === phrases.length - 1}
+            isSuccess={!!rescueMessage}
+          />
+        )}
+      </AnimatePresence>
+    </motion.g>
+  );
+}
+
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -942,6 +1327,13 @@ export default function ProjectsPage() {
   const [videoLayerNode, setVideoLayerNode] = React.useState<HTMLDivElement | null>(null);
   const [isPanningCursor, setIsPanningCursor] = React.useState(false);
   const [camera, setCamera] = React.useState(DEFAULT_CAMERA);
+
+  // Bumped on every "Reset" click so SpriteCar's key changes and React
+  // remounts it, replaying its drive/fall animation from the start (including
+  // START_DELAY and the opacity fade-in) rather than leaving it mid-cycle.
+  // Category switches restart it too, for free, since `category` is already
+  // part of that same key below.
+  const [spriteCarRunId, setSpriteCarRunId] = React.useState(0);
   const capabilities = React.useMemo(() => getDeviceCapabilities(), []);
   const breakpoint = useBreakpoint();
   const [isMounted, setIsMounted] = React.useState(false);
@@ -1130,10 +1522,19 @@ export default function ProjectsPage() {
     height: window.innerHeight
   });
 
+  // A fixed header (rendered outside this component) overlaps the top of the
+  // canvas, so the space that's actually visible below it isn't
+  // initialDimensions.height — it's that minus HEADER_HEIGHT. Centering
+  // against the full window height puts the cover/row too high relative to
+  // what's actually visible; this shifts the vertical center down by half
+  // the header's height so it's centered in the visible region instead.
+  // Tune HEADER_HEIGHT to match the header's real height.
+  const HEADER_HEIGHT = 40;
+
   // Fixed center and viewport
   const center = React.useMemo(() => ({
     x: initialDimensions.width / 2,
-    y: initialDimensions.height / 2
+    y: HEADER_HEIGHT + (initialDimensions.height - HEADER_HEIGHT) / 2
   }), []);
 
   const initialViewport = React.useMemo(() => ({
@@ -1833,6 +2234,15 @@ export default function ProjectsPage() {
               }
             />
           </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {isMounted && !isExiting && (
+              <SpriteCar
+                key={`${category}-${spriteCarRunId}`}
+                target={usmanIntro}
+                reducedMotion={capabilities.prefersReducedMotion}
+              />
+            )}
+          </AnimatePresence>
           {visibleImages.map((img, index) => {
             // Stagger the fade-in: each image gets a slight delay based on its index
             const fadeInDelay = index * 0.05; // 50ms between each image
@@ -2088,7 +2498,10 @@ export default function ProjectsPage() {
           <button
             className="zoom-button"
             style={{ position: 'relative'}}
-            onClick={() => setCamera(resetCamera)}
+            onClick={() => {
+              setCamera(resetCamera);
+              setSpriteCarRunId((id) => id + 1);
+            }}
           >
             Reset
           </button>
@@ -2156,7 +2569,7 @@ export default function ProjectsPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: 10,
-                      border: `1px solid ${passwordError ? '#e5484d' : 'var(--color-stroke-muted)'}`,
+                      border: `1px solid ${passwordError ? 'oklch(0.6265 0.2408 22.98)' : 'var(--color-stroke-muted)'}`,
                       background: 'var(--color-bg)',
                       color: 'var(--color-text)',
                       fontFamily: 'inherit',
@@ -2166,7 +2579,7 @@ export default function ProjectsPage() {
                     }}
                   />
                   {passwordError && (
-                    <div style={{ fontSize: 12, textAlign: 'center', color: '#e5484d' }}>Incorrect password, try again.</div>
+                    <div style={{ fontSize: 12, textAlign: 'center', color: 'oklch(0.6265 0.2408 22.98)' }}>Incorrect password, try again.</div>
                   )}
                   <div style={{ display: 'flex', gap: 12, justifyContent: 'space-between', marginTop: 4 }}>
                     <button
