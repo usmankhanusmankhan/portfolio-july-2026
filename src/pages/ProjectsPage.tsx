@@ -283,7 +283,7 @@ function CategoryDropdown({
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          padding: '20px',
+          padding: '12px',
           margin: 0,
           borderRadius: 9999,
           border: '1px solid var(--color-stroke-muted)',
@@ -296,11 +296,25 @@ function CategoryDropdown({
           boxShadow: '0 2px 8px var(--color-modal-shadow)',
         }}
       >
-        <span>
-          <motion.svg style={{padding: '10px'}} animate={{ opacity: isOpen ? 0 : 1, rotate: isOpen ? 45 : 0, scale: isOpen ? 0.75 : 1, filter: isOpen ? 'blur(4px)' : 'blur(0px)'}} transition={{ duration: 0.25, ease: 'easeInOut' }} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+        <span style={{ position: 'relative', display: 'block', width: 16, height: 16 }}>
+          <motion.svg
+            style={{ position: 'absolute', inset: 0, width: 16, height: 16, display: 'block' }}
+            animate={{ opacity: isOpen ? 0 : 1, rotate: isOpen ? 45 : 0, scale: isOpen ? 0.75 : 1, filter: isOpen ? 'blur(4px)' : 'blur(0px)'}}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m2.75 12.25h10m-10-4h10m-10-4h10" />
           </motion.svg>
-          <motion.svg style={{padding: '10px'}} animate={{ opacity: isOpen ? 1 : 0, rotate: isOpen ? 0 : -45, scale: isOpen ? 1 : 0.75, filter: isOpen ? 'blur(0px)' : 'blur(4px)'}} transition={{ duration: 0.25, ease: 'easeInOut' }} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+          <motion.svg
+            style={{ position: 'absolute', inset: 0, width: 16, height: 16, display: 'block' }}
+            animate={{ opacity: isOpen ? 1 : 0, rotate: isOpen ? 0 : -45, scale: isOpen ? 1 : 0.75, filter: isOpen ? 'blur(0px)' : 'blur(4px)'}}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <path fill="none" stroke="oklch(0.45 0.02 145)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M4 4l8 8m0-8l-8 8" />
           </motion.svg>
         </span>
