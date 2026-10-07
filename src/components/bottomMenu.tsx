@@ -44,10 +44,10 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
         <>
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
-            initial={{ y: -32, opacity: 0, filter: "blur(4px)"}}
+            initial={{ y: -8, opacity: 0, filter: "blur(6px)"}}
             whileInView={{ y: 0, opacity: 1, filter: "blur(0px)"}}
             viewport={{ once: true }}
-            transition={{ duration: 0.5}}>
+            transition={{ duration: 0.3, type: 'spring', stiffness: 100 }}>
             <div className={styles['name']}>
                 Usman Khan
             </div>
