@@ -1,8 +1,61 @@
+import * as React from "react";
 import styles from "./BusinessDevelopmentDigest.module.css";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { imageUrl, preloadImage } from "../utils/imagePreload";
+
+// Intro cascade for the title, subtitle and hero image. Same look and
+// timing as the Projects list view's headline/subhead/cards: each one
+// fades in, un-blurs and drops into place, starting a beat after the last.
+const HERO_HIDDEN = { opacity: 0, y: -8, filter: "blur(4px)" };
+const HERO_SHOWN = {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    // Drop the filter once settled; a leftover blur(0px) keeps the element
+    // on its own layer and can flicker during later page transitions.
+    transitionEnd: { filter: "none" },
+};
+const HERO_SRC = "./digest-hero.webp";
+const OTHER_CASE_STUDY_HERO_SRC = "./ai-patterns-hero.webp";
+
+// Passed as `onUpdate` to every element that fades or blurs. Without it,
+// framer-motion runs opacity/filter animations natively in the browser, and
+// for one frame right as each one finishes the element snaps back to its
+// starting (hidden/blurred) value. Any `onUpdate` makes framer animate in JS
+// and write the real value every frame instead. (Same fix as ProjectsPage.)
+const FORCE_JS_ANIMATION = () => {};
+
+const heroTransition = (delay: number) => ({ duration: 0.5, delay, ease: "easeInOut" as const });
+const TITLE_DELAY = 0.1;
+const SUBTITLE_DELAY = 0.3;
+const HERO_IMAGE_DELAY = 0.45;
 
 export default function BusinessDevelopmentDigest() {
     const navigate = useNavigate();
+
+    // The hero only starts its fade-in once the image has actually loaded
+    // and decoded, so it never animates in as an empty box and then pops.
+    // It's preloaded from the Projects page, so this is usually already true
+    // by the time the page mounts and the cascade runs on its normal timing.
+    const heroRef = React.useRef<HTMLImageElement>(null);
+    // In-memory copy of the hero if it was preloaded (draws with no network
+    // request); falls back to the normal URL on a first, cold visit.
+    const [heroSrc] = React.useState(() => imageUrl(HERO_SRC));
+    const [heroReady, setHeroReady] = React.useState(false);
+    React.useLayoutEffect(() => {
+        const img = heroRef.current;
+        if (img?.complete && img.naturalWidth > 0) setHeroReady(true);
+    }, []);
+
+    // Keep both case-study heroes in memory: this page's own (for coming
+    // back to it later) and the AI patterns one, linked under "More
+    // projects!!!" at the bottom of this page.
+    React.useEffect(() => {
+        preloadImage(HERO_SRC);
+        preloadImage(OTHER_CASE_STUDY_HERO_SRC);
+    }, []);
+
     return (
         <div>
             <div className={styles.back_div}>
@@ -47,25 +100,39 @@ export default function BusinessDevelopmentDigest() {
             </div>
             <div className={styles.casestudy}>
                 <div style={{marginBottom: "40px"}}>
-                    <h1 
+                    <motion.h1
                         className={styles.title_hero}
+                        initial={HERO_HIDDEN}
+                        animate={HERO_SHOWN}
+                        transition={heroTransition(TITLE_DELAY)}
+                        onUpdate={FORCE_JS_ANIMATION}
                     >
                         Business development digest
-                    </h1>
-                    <p
+                    </motion.h1>
+                    <motion.p
                         className={styles.body_hero}
+                        initial={HERO_HIDDEN}
+                        animate={HERO_SHOWN}
+                        transition={heroTransition(SUBTITLE_DELAY)}
+                        onUpdate={FORCE_JS_ANIMATION}
                     >
                         Redefining how lawyers action business development opportunities by designing an agentic playbook
-                    </p>
+                    </motion.p>
                 </div>
-                <img
-                    className= {styles.hero_image} 
-                    style={{marginBottom: "16px"}} 
-                    src="./digest-hero.webp"
+                <motion.img
+                    ref={heroRef}
+                    className={styles.hero_image}
+                    style={{marginBottom: "16px"}}
+                    src={heroSrc}
+                    alt="Business development digest"
                     fetchPriority="high"
-                    decoding="sync"
-                >
-                </img>
+                    decoding="async"
+                    onLoad={() => setHeroReady(true)}
+                    initial={HERO_HIDDEN}
+                    animate={heroReady ? HERO_SHOWN : HERO_HIDDEN}
+                    transition={heroTransition(HERO_IMAGE_DELAY)}
+                    onUpdate={FORCE_JS_ANIMATION}
+                />
                 <div className={styles.roles_and_timelines}>
                     <div>
                         <p className={styles.body_role} style={{fontWeight: "300", marginBottom: "6px", color: "#333", fontSize: "14px"}}>Role</p>

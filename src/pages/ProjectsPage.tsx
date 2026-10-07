@@ -7,6 +7,7 @@ import { useBreakpoint, type Breakpoint } from '../hooks/useBreakpoint';
 import { imageConfig, ImageConfig } from '../config/imageConfig';
 import { professionalProjects, artProjects, experimentalProjects } from '../config/projectContent';
 import artContent from '../config/artContent.json';
+import { preloadImage } from '../utils/imagePreload';
 
 interface Point {
   x: number;
@@ -280,6 +281,7 @@ function CategoryDropdown({
         initial={skipIntro ? false : { opacity: 0, filter: 'blur(4px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
         transition={{duration: 0.4, delay: 1.65}}
+        onUpdate={FORCE_JS_ANIMATION}
         onClick={() => setIsOpen((open) => !open)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -331,6 +333,7 @@ function CategoryDropdown({
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
             transition={{ duration: 0.15, ease: 'easeInOut' }}
+            onUpdate={FORCE_JS_ANIMATION}
             style={{
               listStyle: 'none',
               margin: '8px 0 0',
@@ -392,6 +395,10 @@ const LIST_THUMBNAIL_SRCS = [
   './ai-patterns-list.webp',
   './embedded-celeste-list.webp',
   './reading-journal.webp',
+  // Case-study hero images, so they're already cached when someone clicks
+  // through to the case study instead of loading in after the page opens.
+  './digest-hero.webp',
+  './ai-patterns-hero.webp',
 ];
 
 // Featured/Experiments tab panels stay mounted the whole time and just
@@ -421,15 +428,16 @@ const CANVAS_SWITCH_SCALE_DURATION = 0.5;
 const CANVAS_SWITCH_SCALE_EASE = [0.22, 1, 0.36, 1] as const;
 const CANVAS_SWITCH_STAGGER = 0.04; // seconds between each thumbnail
 
-// Passed as `onUpdate` to the two view wrappers. framer-motion normally
-// hands opacity fades to the browser's native animation engine (WAAPI),
-// which animates on top of a stale inline `opacity: 1`. When an exit fade
-// finishes, that native animation is cancelled a frame before React removes
-// the element, so the browser falls back to the inline `opacity: 1` for one
-// frame: the outgoing view flashes back fully visible right at the end of
-// its fade. Any `onUpdate` handler makes framer animate the value in JS
-// instead, writing the real opacity to the element every frame, so there's
-// nothing stale to fall back to.
+// Passed as `onUpdate` to every element here that fades or blurs.
+// framer-motion normally hands opacity/filter animations to the browser's
+// native animation engine (WAAPI), which runs on top of a stale inline
+// starting value (e.g. `opacity: 0` / `blur(4px)` for an intro, or
+// `opacity: 1` for an exit). When the native animation finishes it's
+// cancelled a frame before framer writes the final value, so for one frame
+// the element snaps back to that stale value: intros flash back to hidden
+// right as they finish, exits flash back to visible. Any `onUpdate` handler
+// makes framer animate the value in JS instead, writing the real value every
+// frame, so there's nothing stale to fall back to.
 const FORCE_JS_ANIMATION = () => {};
 
 // List <-> Canvas view switch. The outgoing view fades out over
@@ -490,14 +498,8 @@ function ProjectsListView({
     return () => observer.disconnect();
   }, [projectsTab]);
 
-  const preloadedThumbnailsRef = React.useRef<HTMLImageElement[]>([]);
   React.useEffect(() => {
-    preloadedThumbnailsRef.current = LIST_THUMBNAIL_SRCS.map((src) => {
-      const img = new Image();
-      img.src = src;
-      img.decode?.().catch(() => {});
-      return img;
-    });
+    LIST_THUMBNAIL_SRCS.forEach((src) => preloadImage(src));
   }, []);
 
   // One-time intro cascade: headline, then subhead, then tabs, then cards,
@@ -587,6 +589,7 @@ function ProjectsListView({
                 ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.1, ease: 'easeInOut' }}
+              onUpdate={FORCE_JS_ANIMATION}
             >
               <h1
                 style={{
@@ -613,6 +616,7 @@ function ProjectsListView({
                 ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.3, ease: 'easeInOut' }}
+              onUpdate={FORCE_JS_ANIMATION}
               style={{
                   fontFamily: 'AspektaVF',
                   fontSize: 'clamp(12px, 3.5vw, 16px)',
@@ -632,6 +636,7 @@ function ProjectsListView({
                 ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.45, ease: 'easeInOut' }}
+              onUpdate={FORCE_JS_ANIMATION}
               style={{ display: 'flex', gap: 0, alignItems: 'center' }}
             >
               <button
@@ -798,6 +803,7 @@ function ProjectsListView({
                 // the gap between the outgoing and incoming panel.
                 height: { duration: 0.35, ease: 'easeInOut', delay: 0.1 },
               }}
+              onUpdate={FORCE_JS_ANIMATION}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -812,6 +818,7 @@ function ProjectsListView({
                     initial={false}
                     animate={projectsTab === 'selected' ? LIST_TAB_PANEL_ACTIVE : LIST_TAB_PANEL_INACTIVE}
                     transition={projectsTab === 'selected' ? LIST_TAB_PANEL_ENTER_TRANSITION : LIST_TAB_PANEL_EXIT_TRANSITION}
+                    onUpdate={FORCE_JS_ANIMATION}
                     aria-hidden={projectsTab !== 'selected'}
                     style={{
                       display: 'flex',
@@ -900,6 +907,7 @@ function ProjectsListView({
                     initial={false}
                     animate={projectsTab === 'experiments' ? LIST_TAB_PANEL_ACTIVE : LIST_TAB_PANEL_INACTIVE}
                     transition={projectsTab === 'experiments' ? LIST_TAB_PANEL_ENTER_TRANSITION : LIST_TAB_PANEL_EXIT_TRANSITION}
+                    onUpdate={FORCE_JS_ANIMATION}
                     aria-hidden={projectsTab !== 'experiments'}
                     style={{
                       display: 'flex',
@@ -2723,6 +2731,7 @@ export default function ProjectsPage() {
         initial={skipCanvasIntro ? false : {opacity: 0, scale: 0.95, filter: "blur(6px)"}}
         whileInView={{opacity: 1, scale: 1, filter: "blur(0px)"}}
         transition={{duration: 0.4, delay: 1.5}}
+        onUpdate={FORCE_JS_ANIMATION}
       >
           <button
             className="zoom-button"

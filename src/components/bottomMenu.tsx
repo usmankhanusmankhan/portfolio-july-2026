@@ -22,6 +22,8 @@ type BottomMenuProps = {
     onViewModeChange?: (mode: 'canvas' | 'list') => void;
 };
 
+const FORCE_JS_ANIMATION = () => {};
+
 const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewModeChange }) => {
     const navigate = useNavigate();
     const linksData = links as LinksData;
@@ -45,9 +47,25 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
             initial={{ y: -8, opacity: 0, filter: "blur(6px)"}}
-            whileInView={{ y: 0, opacity: 1, filter: "blur(0px)"}}
+            // transitionEnd drops the filter once the blur-in finishes: a
+            // leftover blur(0px) keeps the navbar on its own layer for good.
+            whileInView={{ y: 0, opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
             viewport={{ once: true }}
-            transition={{ duration: 0.3, type: 'spring', stiffness: 100 }}>
+            transition={{
+                duration: 0.3,
+                type: 'spring',
+                stiffness: 100,
+                // Opacity and blur get a plain tween; only the slide springs.
+                // A spring overshoots past its target, and a blur that
+                // overshoots below 0 is invalid CSS, which flickers.
+                opacity: { duration: 0.3, ease: 'easeOut' },
+                filter: { duration: 0.3, ease: 'easeOut' },
+            }}
+            // Without this, the blur/opacity snap back to their starting
+            // values for one frame right as they finish (framer runs them
+            // natively in the browser over stale inline values). Any onUpdate
+            // makes framer animate them in JS instead.
+            onUpdate={FORCE_JS_ANIMATION}>
             <div className={styles['name']}>
                 Usman Khan
             </div>
