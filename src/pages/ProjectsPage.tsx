@@ -234,9 +234,13 @@ const CATEGORY_OPTIONS: { value: ProjectCategory; label: string }[] = [
 function CategoryDropdown({
   value,
   onChange,
+  skipIntro = false,
 }: {
   value: ProjectCategory;
   onChange: (next: ProjectCategory) => void;
+  // True when the canvas was entered from the list view: the view fade
+  // already brings this in, so its own delayed intro is skipped.
+  skipIntro?: boolean;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -273,7 +277,7 @@ function CategoryDropdown({
     >
       <motion.button
         type="button"
-        initial={{ opacity: 0, filter: 'blur(4px)' }}
+        initial={skipIntro ? false : { opacity: 0, filter: 'blur(4px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
         transition={{duration: 0.4, delay: 1.65}}
         onClick={() => setIsOpen((open) => !open)}
@@ -377,6 +381,64 @@ function CategoryDropdown({
  */
 let projectsListIntroCompletedThisLoad = false;
 
+// Once an element's blur-in finishes, drop its filter entirely. A leftover
+// `filter: blur(0px)` still keeps the element on its own filter layer, and
+// while the whole list view fades out those layers get re-rasterized every
+// frame, which is what made the list flicker on the way to canvas.
+const SETTLED_FILTER = (done: boolean) => (done ? { transitionEnd: { filter: 'none' } } : {});
+
+const LIST_THUMBNAIL_SRCS = [
+  './bd-digest-list.webp',
+  './ai-patterns-list.webp',
+  './embedded-celeste-list.webp',
+  './reading-journal.webp',
+];
+
+// Featured/Experiments tab panels stay mounted the whole time and just
+// crossfade (fade + blur) between active and inactive. Mounting/unmounting
+// them on every switch is what made the images flicker: each switch tore
+// the <img>s down and re-created them, and the container briefly collapsed
+// to zero height between the outgoing and incoming panel.
+//
+// Tweak points:
+//   ACTIVE / INACTIVE: how each panel looks when shown vs. hidden
+//     (opacity = fade, filter blur = blur, scale = shrink).
+//   EXIT: how the outgoing panel leaves.
+//   ENTER: how the incoming panel arrives. Its `delay` is the gap between
+//     the two: the outgoing panel starts leaving immediately, and the
+//     incoming one waits this long before it starts coming in.
+const LIST_TAB_PANEL_ACTIVE = { opacity: 1, filter: 'blur(0px)', scale: 1, transitionEnd: { filter: 'none' } };
+const LIST_TAB_PANEL_INACTIVE = { opacity: 0, filter: 'blur(6px)', scale: 0.95 };
+const LIST_TAB_PANEL_EXIT_TRANSITION = { duration: 0.25, ease: 'easeIn' } as const;
+const LIST_TAB_PANEL_ENTER_TRANSITION = { duration: 0.35, ease: [0.22, 1, 0.36, 1], delay: 0.18 } as const;
+
+// Scale-in for the cover + thumbnails when the canvas is entered from the
+// list view. A smooth tween rather than the page-load spring (which is
+// underdamped and bounces), and offset by VIEW_SWITCH_GAP so it starts in
+// step with the canvas fading in.
+const CANVAS_SWITCH_SCALE_FROM = 0.9;
+const CANVAS_SWITCH_SCALE_DURATION = 0.5;
+const CANVAS_SWITCH_SCALE_EASE = [0.22, 1, 0.36, 1] as const;
+const CANVAS_SWITCH_STAGGER = 0.04; // seconds between each thumbnail
+
+// Passed as `onUpdate` to the two view wrappers. framer-motion normally
+// hands opacity fades to the browser's native animation engine (WAAPI),
+// which animates on top of a stale inline `opacity: 1`. When an exit fade
+// finishes, that native animation is cancelled a frame before React removes
+// the element, so the browser falls back to the inline `opacity: 1` for one
+// frame: the outgoing view flashes back fully visible right at the end of
+// its fade. Any `onUpdate` handler makes framer animate the value in JS
+// instead, writing the real opacity to the element every frame, so there's
+// nothing stale to fall back to.
+const FORCE_JS_ANIMATION = () => {};
+
+// List <-> Canvas view switch. The outgoing view fades out over
+// VIEW_SWITCH_EXIT_DURATION, then nothing shows for VIEW_SWITCH_GAP seconds,
+// then the incoming view fades in over VIEW_SWITCH_ENTER_DURATION.
+const VIEW_SWITCH_EXIT_DURATION = 0.25;
+const VIEW_SWITCH_GAP = 0.15;
+const VIEW_SWITCH_ENTER_DURATION = 0.3;
+
 const PROJECTS_LIST_HEADLINE =
   "Hi, this is Usman! I use design and code to turn complex enterprise problems into enjoyable software that anyone can use.";
 
@@ -405,6 +467,39 @@ function ProjectsListView({
   const [hoverTab, setHoverTab] = React.useState<'selected' | 'experiments' | null>(null);
   const tabBorderLength = 214;
 
+  // Preload + decode every list thumbnail on mount, including the ones in
+  // the tab that isn't showing yet. Each tab's <img> only mounts when that
+  // tab is selected, so without this the first switch to a tab has to wait
+  // on a network fetch + decode, which is why the picture popped in late.
+  // Height of whichever tab panel is active. The inactive panel is taken out
+  // of flow (position: absolute), so the container animates to this instead
+  // of snapping when the panels swap.
+  const selectedPanelRef = React.useRef<HTMLDivElement>(null);
+  const experimentsPanelRef = React.useRef<HTMLDivElement>(null);
+  const [panelHeight, setPanelHeight] = React.useState<number | 'auto'>('auto');
+  React.useLayoutEffect(() => {
+    const active = projectsTab === 'selected' ? selectedPanelRef.current : experimentsPanelRef.current;
+    const inactive = projectsTab === 'selected' ? experimentsPanelRef.current : selectedPanelRef.current;
+    // `inert` keeps the hidden panel's cards out of tab order and clicks.
+    if (active) active.inert = false;
+    if (inactive) inactive.inert = true;
+    if (!active) return;
+    setPanelHeight(active.offsetHeight);
+    const observer = new ResizeObserver(() => setPanelHeight(active.offsetHeight));
+    observer.observe(active);
+    return () => observer.disconnect();
+  }, [projectsTab]);
+
+  const preloadedThumbnailsRef = React.useRef<HTMLImageElement[]>([]);
+  React.useEffect(() => {
+    preloadedThumbnailsRef.current = LIST_THUMBNAIL_SRCS.map((src) => {
+      const img = new Image();
+      img.src = src;
+      img.decode?.().catch(() => {});
+      return img;
+    });
+  }, []);
+
   // One-time intro cascade: headline, then subhead, then tabs, then cards,
   // each via its own transition delay below. This just flips a flag shortly
   // after mount so those per-element animate targets change.
@@ -429,9 +524,31 @@ function ProjectsListView({
   return (
     <motion.div
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      animate={{
+        opacity: 1,
+        transition: { duration: VIEW_SWITCH_ENTER_DURATION, delay: VIEW_SWITCH_GAP, ease: 'easeOut' },
+      }}
+      exit={{ opacity: 0, transition: { duration: VIEW_SWITCH_EXIT_DURATION, ease: 'easeIn' } }}
+      // See FORCE_JS_ANIMATION: without it the list snaps back to full
+      // opacity for one frame at the end of its fade-out.
+      onUpdate={FORCE_JS_ANIMATION}
+      // The fade lives on this outer layer, and the scrolling happens on the
+      // plain div inside it. Two things here stop the flicker:
+      //  - will-change: opacity keeps the whole list on one composited layer
+      //    for its entire life. Without it, the browser only promotes the
+      //    list to a layer at the moment the fade starts, which re-rasterizes
+      //    everything and visibly shifts text rendering for a frame.
+      //  - Fading a scroll container directly (overflow: auto) makes its
+      //    scrolled content, and the testimonial carousel's CSS animation
+      //    inside it, re-composite every frame; fading a plain wrapper
+      //    around it doesn't.
+      style={{
+        position: 'absolute',
+        inset: 0,
+        willChange: 'opacity',
+      }}
+    >
+    <div
       style={{
         position: 'absolute',
         inset: 0,
@@ -467,6 +584,7 @@ function ProjectsListView({
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
                 filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
+                ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.1, ease: 'easeInOut' }}
             >
@@ -492,6 +610,7 @@ function ProjectsListView({
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
                 filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
+                ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.3, ease: 'easeInOut' }}
               style={{
@@ -510,6 +629,7 @@ function ProjectsListView({
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
                 filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
+                ...SETTLED_FILTER(headerAnimationDone),
               }}
               transition={{ duration: 0.5, delay: 0.45, ease: 'easeInOut' }}
               style={{ display: 'flex', gap: 0, alignItems: 'center' }}
@@ -662,14 +782,22 @@ function ProjectsListView({
               </button>
             </motion.div>
             <motion.div
-              layout
               initial={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
               animate={{
                 opacity: headerAnimationDone ? 1 : 0,
                 y: headerAnimationDone ? 0 : -8,
                 filter: headerAnimationDone ? 'blur(0px)' : 'blur(5px)',
+                height: panelHeight,
+                ...SETTLED_FILTER(headerAnimationDone),
               }}
-              transition={{ duration: 0.5, delay: 0.55, ease: 'easeInOut' }}
+              transition={{
+                duration: 0.5,
+                delay: 0.55,
+                ease: 'easeInOut',
+                // Starts partway through the exit so the section resizes in
+                // the gap between the outgoing and incoming panel.
+                height: { duration: 0.35, ease: 'easeInOut', delay: 0.1 },
+              }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -679,12 +807,24 @@ function ProjectsListView({
               }}
               className="cards-grid cards-grid-single"
             >
-              <AnimatePresence mode="wait" initial={false}>
-                {projectsTab === 'selected' && (
                   <motion.div
-                    key="selected"
-                    
-                    style={{ display: 'flex', flexDirection: 'column', gap: 48, width: '100%' }}
+                    ref={selectedPanelRef}
+                    initial={false}
+                    animate={projectsTab === 'selected' ? LIST_TAB_PANEL_ACTIVE : LIST_TAB_PANEL_INACTIVE}
+                    transition={projectsTab === 'selected' ? LIST_TAB_PANEL_ENTER_TRANSITION : LIST_TAB_PANEL_EXIT_TRANSITION}
+                    aria-hidden={projectsTab !== 'selected'}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 48,
+                      width: '100%',
+                      position: projectsTab === 'selected' ? 'relative' : 'absolute',
+                      top: 0,
+                      left: 0,
+                      pointerEvents: projectsTab === 'selected' ? 'auto' : 'none',
+                      transformOrigin: 'top center',
+
+                    }}
                   >
                     <button
                       className="card"
@@ -699,7 +839,7 @@ function ProjectsListView({
                         <img
                           src="./bd-digest-list.webp"
                           alt="Activator playbook"
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
@@ -725,7 +865,7 @@ function ProjectsListView({
                         <img
                           src="./ai-patterns-list.webp"
                           alt="AI patterns"
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
@@ -742,7 +882,7 @@ function ProjectsListView({
                         <img
                           src="./embedded-celeste-list.webp"
                           alt="Reach out panel"
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }}
                         />
@@ -755,12 +895,24 @@ function ProjectsListView({
                       </div>
                     </div>
                   </motion.div>
-                )}
-                {projectsTab === 'experiments' && (
                   <motion.div
-                    key="experiments"
-                    
-                    style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%' }}
+                    ref={experimentsPanelRef}
+                    initial={false}
+                    animate={projectsTab === 'experiments' ? LIST_TAB_PANEL_ACTIVE : LIST_TAB_PANEL_INACTIVE}
+                    transition={projectsTab === 'experiments' ? LIST_TAB_PANEL_ENTER_TRANSITION : LIST_TAB_PANEL_EXIT_TRANSITION}
+                    aria-hidden={projectsTab !== 'experiments'}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 40,
+                      width: '100%',
+                      position: projectsTab === 'experiments' ? 'relative' : 'absolute',
+                      top: 0,
+                      left: 0,
+                      pointerEvents: projectsTab === 'experiments' ? 'auto' : 'none',
+                      transformOrigin: 'top center',
+
+                    }}
                   >
                     <button
                       className="card"
@@ -790,8 +942,6 @@ function ProjectsListView({
                       </div>
                     </button>
                   </motion.div>
-                )}
-              </AnimatePresence>
             </motion.div>
           </div>
           <div style={{paddingTop: '16px'}}>
@@ -943,6 +1093,7 @@ function ProjectsListView({
               </div>
           </div>
       </div>
+    </div>
     </motion.div>
   );
 }
@@ -1335,7 +1486,28 @@ function SpriteCar({
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const ref = React.useRef<SVGSVGElement>(null);
+  const ref = React.useRef<SVGSVGElement | null>(null);
+  // The <svg> mounts a beat AFTER viewMode flips to 'canvas' (the list view
+  // has to finish fading out first), so effects that need the element
+  // depend on this state instead of reading ref.current once on the flip,
+  // when it's still null.
+  const [svgNode, setSvgNode] = React.useState<SVGSVGElement | null>(null);
+  const setSvgRef = React.useCallback((node: SVGSVGElement | null) => {
+    ref.current = node;
+    setSvgNode(node);
+  }, []);
+
+  // True while the canvas is mounting as the result of a List -> Canvas
+  // switch. For that mount the grid, category menu and Reset skip their own
+  // delayed intros (the view fade brings them in), and the cover +
+  // thumbnails scale in with a smooth tween instead of the bouncy
+  // page-load spring. A page load straight into canvas still plays the full
+  // intro, and category switches afterward still use the normal spring.
+  const skipCanvasIntroRef = React.useRef(false);
+  const setCanvasWrapperRef = React.useCallback((node: HTMLDivElement | null) => {
+    if (node) requestAnimationFrame(() => { skipCanvasIntroRef.current = false; });
+  }, []);
+  const skipCanvasIntro = skipCanvasIntroRef.current;
   // Videos are portaled into this plain HTML layer instead of rendered via
   // SVG <foreignObject> — see the mediaType === 'video' branch below for why.
   const [videoLayerNode, setVideoLayerNode] = React.useState<HTMLDivElement | null>(null);
@@ -1361,7 +1533,7 @@ export default function ProjectsPage() {
   // override that on first load — read once here so those links still work.
   // After that initial read, toggling via the bottom menu only updates
   // local state; the ?view= param itself gets stripped from the URL below.
-  const breakpointDefaultViewMode: 'canvas' | 'list' = breakpoint === 'mobile' ? 'list' : 'canvas';
+  const breakpointDefaultViewMode: 'canvas' | 'list' = 'list';
   const [viewModeOverride, setViewModeOverride] = React.useState<'canvas' | 'list' | null>(() => {
     const initialParam = urlParams.get('view');
     return initialParam === 'list' || initialParam === 'canvas' ? initialParam : null;
@@ -1407,7 +1579,9 @@ export default function ProjectsPage() {
   // URL actually differing before/after.
   const handleViewModeChange = React.useCallback(
     (mode: 'canvas' | 'list') => {
+      if (mode === 'list') setHoveredImage(null);
       if (mode === 'canvas' && viewMode === 'list') {
+        skipCanvasIntroRef.current = true;
         setCamera(DEFAULT_CAMERA);
       }
       setViewMode(mode);
@@ -1818,7 +1992,7 @@ export default function ProjectsPage() {
   React.useEffect(() => {
     if (viewMode !== 'canvas') return;
 
-    const svg = ref.current;
+    const svg = svgNode;
     if (!svg) return;
 
     const DRAG_THRESHOLD = 4; // px of movement before a left-click counts as a pan
@@ -1890,7 +2064,7 @@ export default function ProjectsPage() {
       window.removeEventListener("mouseup", handleMouseUp);
       svg.removeEventListener("click", handleClickCapture, true);
     };
-  }, [viewMode]);
+  }, [viewMode, svgNode]);
 
   // Fixed dependency array
   React.useEffect(() => {
@@ -2119,6 +2293,10 @@ export default function ProjectsPage() {
   return (
     <div style={{ overflow: 'hidden', width: '100vw', height: '100vh', position: 'relative' }}>
       <BottomMenu viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+      {/* Both views share one AnimatePresence in "wait" mode: the outgoing
+          view (including the canvas grid) finishes fading out before the
+          incoming one starts, and the incoming one adds VIEW_SWITCH_GAP on
+          top of that. */}
       <AnimatePresence mode="wait">
         {viewMode === 'list' && (
           <ProjectsListView
@@ -2129,12 +2307,29 @@ export default function ProjectsPage() {
             onRequestCaseStudyAccess={requestCaseStudyAccess}
           />
         )}
-      </AnimatePresence>
       {viewMode === 'canvas' && (
-      <>
-      <CategoryDropdown value={category} onChange={handleCategoryChange} />
+      // Opacity only on this wrapper, no filter/transform: either of those
+      // would make it the containing block for the position: fixed
+      // children inside (dropdown, hover pill, Reset), shifting them.
+      <motion.div
+        key="canvas"
+        ref={setCanvasWrapperRef}
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: 1,
+          transition: { duration: VIEW_SWITCH_ENTER_DURATION, delay: VIEW_SWITCH_GAP, ease: 'easeOut' },
+        }}
+        exit={{ opacity: 0, transition: { duration: VIEW_SWITCH_EXIT_DURATION, ease: 'easeIn' } }}
+        onUpdate={FORCE_JS_ANIMATION}
+        // Same reason as the list view: stay on one composited layer so the
+        // fade doesn't trigger a re-rasterize when it starts. will-change:
+        // opacity (unlike transform/filter) doesn't affect the fixed
+        // children inside.
+        style={{ position: 'absolute', inset: 0, willChange: 'opacity' }}
+      >
+      <CategoryDropdown value={category} onChange={handleCategoryChange} skipIntro={skipCanvasIntro} />
       <svg
-        ref={ref}
+        ref={setSvgRef}
         style={{
           touchAction: 'none',
           WebkitTouchCallout: 'none',
@@ -2166,7 +2361,7 @@ export default function ProjectsPage() {
           }}
         >
           <motion.g
-            initial={{ opacity: 0, filter: PROJECTS_FILTER_NONE }}
+            initial={skipCanvasIntro ? false : { opacity: 0, filter: PROJECTS_FILTER_NONE }}
             animate={
               isExiting
                 ? {
@@ -2205,7 +2400,11 @@ export default function ProjectsPage() {
               preserveAspectRatio="xMidYMid meet"
 
               style={{ willChange: 'opacity, transform, filter' }}
-              initial={{ opacity: 0, scale: 0.85, filter: PROJECTS_FILTER_NONE }}
+              initial={{
+                opacity: 0,
+                scale: skipCanvasIntro ? CANVAS_SWITCH_SCALE_FROM : 0.85,
+                filter: PROJECTS_FILTER_NONE,
+              }}
               animate={
                 isExiting
                   ? {
@@ -2230,7 +2429,13 @@ export default function ProjectsPage() {
                   ? { duration: 0 }
                   : isExiting
                     ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-                    : {
+                    : skipCanvasIntro
+                      ? {
+                          duration: CANVAS_SWITCH_SCALE_DURATION,
+                          ease: CANVAS_SWITCH_SCALE_EASE,
+                          delay: VIEW_SWITCH_GAP,
+                        }
+                      : {
                         opacity: {
                           delay: coverHasEnteredRef.current ? 0 : 0.3,
                           type: 'spring',
@@ -2279,11 +2484,19 @@ export default function ProjectsPage() {
                     filter: 'brightness(1)',
                   };
 
+            const switchInTransition = {
+              opacity: { delay: VIEW_SWITCH_GAP + index * CANVAS_SWITCH_STAGGER, duration: CANVAS_SWITCH_SCALE_DURATION, ease: CANVAS_SWITCH_SCALE_EASE },
+              scale: { delay: VIEW_SWITCH_GAP + index * CANVAS_SWITCH_STAGGER, duration: CANVAS_SWITCH_SCALE_DURATION, ease: CANVAS_SWITCH_SCALE_EASE },
+              filter: { duration: 0.15, ease: 'easeInOut' },
+            };
+
             const transitionState = capabilities.prefersReducedMotion
               ? { duration: 0 }
               : isExiting
                 ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-                : {
+                : skipCanvasIntro
+                  ? switchInTransition
+                  : {
                     opacity: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 10 },
                     scale: { delay: fadeInDelay, type: 'spring', stiffness: 100, damping: 10 },
                     filter: { duration: 0.15, ease: 'easeInOut' },
@@ -2301,7 +2514,9 @@ export default function ProjectsPage() {
               ? { duration: 0 }
               : isExiting
                 ? { duration: PROJECTS_EXIT_DURATION, ease: 'easeInOut' }
-                : {
+                : skipCanvasIntro
+                  ? switchInTransition
+                  : {
                     opacity: { delay: fadeInDelay, duration: 0.4, ease: 'easeOut' },
                     scale: { delay: fadeInDelay, duration: 0.4, ease: 'easeOut' },
                     filter: { duration: 0.15, ease: 'easeInOut' },
@@ -2368,7 +2583,7 @@ export default function ProjectsPage() {
                   muted
                   loop
                   playsInline
-                  initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
+                  initial={{ opacity: 0, scale: skipCanvasIntro ? CANVAS_SWITCH_SCALE_FROM : 0.85, filter: 'brightness(1)' }}
                   animate={animateState}
                   transition={videoTransitionState}
                   style={{
@@ -2398,7 +2613,7 @@ export default function ProjectsPage() {
                 href={img.href}
                 x={img.x}
                 y={img.y}
-                initial={{ opacity: 0, scale: 0.85, filter: 'brightness(1)' }}
+                initial={{ opacity: 0, scale: skipCanvasIntro ? CANVAS_SWITCH_SCALE_FROM : 0.85, filter: 'brightness(1)' }}
                 animate={animateState}
                 transition={transitionState}
                 style={{
@@ -2505,7 +2720,7 @@ export default function ProjectsPage() {
       </AnimatePresence>
       <motion.div
         className="zoom-box"
-        initial={{opacity: 0, scale: 0.95, filter: "blur(6px)"}}
+        initial={skipCanvasIntro ? false : {opacity: 0, scale: 0.95, filter: "blur(6px)"}}
         whileInView={{opacity: 1, scale: 1, filter: "blur(0px)"}}
         transition={{duration: 0.4, delay: 1.5}}
       >
@@ -2521,8 +2736,9 @@ export default function ProjectsPage() {
           </button>
         
       </motion.div>
-      </>
+      </motion.div>
       )}
+      </AnimatePresence>
       {ReactDOM.createPortal(
         <AnimatePresence>
           {passwordModalTarget && (

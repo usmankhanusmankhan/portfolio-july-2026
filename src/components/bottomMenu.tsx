@@ -44,10 +44,10 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
         <>
         <motion.nav 
             className={`${styles.navbar} ${!fixed ? styles.navbarStatic : ''}`}
-            initial={{ y: -50}}
-            whileInView={{ y: 0 }}
+            initial={{ y: -32, opacity: 0, filter: "blur(4px)"}}
+            whileInView={{ y: 0, opacity: 1, filter: "blur(0px)"}}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 1, type: 'spring', stiffness: 100 }}>
+            transition={{ duration: 0.5}}>
             <div className={styles['name']}>
                 Usman Khan
             </div>
@@ -66,7 +66,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ fixed = true, viewMode, onViewM
                 ))}
             {viewMode && onViewModeChange && (
                 <div className={styles['view-switcher']} role="tablist" aria-label="Project view">
-                    {(['canvas', 'list'] as const).map((mode) => (
+                    {(['list', 'canvas'] as const).map((mode) => (
                         <button
                             key={mode}
                             className={styles['view-switcher-button']}
