@@ -152,7 +152,7 @@ export default function AiPatterns() {
                     </div>
                 </div>
                 <div style={{marginBottom: "80px", paddingBottom: "80px", borderBottom: "1px solid #E1EED3"}}>
-                    <h1 style={{marginBottom: "24px"}} className={styles.title_hero}>Here's how the work is moving the needle</h1>
+                    <h1 style={{marginBottom: "24px", fontSize: 'clamp(16px, 3.5vw, 20px)'}} className={styles.title_hero}>Here's how the work is moving the needle</h1>
                     <div className={styles.card_row}>
                             <div className={styles.info_card}>
                                 <p className={styles.card_body} style={{fontWeight: "500", marginBottom: "8px"}}>Cross-platform adoption</p>

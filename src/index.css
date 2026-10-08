@@ -209,6 +209,21 @@ svg g {
   display: flex;
   overflow-x: hidden;
 
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 2%,
+    black 98%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 3%,
+    black 97%,
+    transparent 100%
+  );
+
 }
 
 .carousel::-webkit-scrollbar {
