@@ -1212,8 +1212,6 @@ function SpriteCar({
   phrases = DEFAULT_SPRITE_CAR_PHRASES,
   phraseDuration = 2.5,
 }: SpriteCarProps) {
-  if (reducedMotion) return null;
-
   const [phraseIndex, setPhraseIndex] = React.useState(0);
 
   // CAR_WIDTH/CAR_HEIGHT must match car-sprite.svg's viewBox exactly
@@ -1279,6 +1277,52 @@ function SpriteCar({
   const [isClickable, setIsClickable] = React.useState(false);
   const [rescueMessage, setRescueMessage] = React.useState<string | null>(null);
 
+  // Background-tab handling. While the tab is hidden, Chrome pauses
+  // requestAnimationFrame (so Framer Motion's drive/fall freezes) but keeps
+  // running setTimeout/setInterval (throttled), so the bubble/click timers
+  // drift out of step with the car. Instead, everything stops while hidden,
+  // and returning to the tab bumps cycleId to restart the lap from a clean
+  // slate, so motion and timers start on the same clock again.
+  const RESUME_DELAY = 0.6; // pause before the car restarts after returning to the tab
+  // On return, the car first fades out from wherever it froze (over this
+  // long), then the new lap starts after the rest of RESUME_DELAY.
+  const RESUME_FADE_OUT = 0.3;
+  const [cycleId, setCycleId] = React.useState(0);
+  // Which lap the inner rotate group is on. Lags cycleId until the resume
+  // fade-out finishes, so a car frozen mid-fall keeps its tilt while it
+  // fades instead of snapping upright.
+  const [rotateCycleId, setRotateCycleId] = React.useState(0);
+  const [isHidden, setIsHidden] = React.useState(() => document.hidden);
+
+  const isStoppedRef = React.useRef(isStopped);
+  isStoppedRef.current = isStopped;
+
+  React.useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) {
+        setIsHidden(true);
+        // Leave the rescue bubble alone if the car was already saved.
+        if (!isStoppedRef.current) {
+          setBubbleActive(false);
+          setIsClickable(false);
+        }
+      } else {
+        setIsHidden(false);
+        setCycleId((c) => c + 1);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  // First lap keeps the page-load hold-back; laps restarted after
+  // returning to the tab use a shorter pause.
+  const lapStartDelay = cycleId === 0 ? START_DELAY : RESUME_DELAY;
+  // Delay left for the motion itself once the resume fade-out is done, so
+  // the lap still starts lapStartDelay after returning (in step with the
+  // bubble/click timers, which are scheduled from that same moment).
+  const motionStartDelay = cycleId === 0 ? START_DELAY : RESUME_DELAY - RESUME_FADE_OUT;
+
   // Drives the bubble's per-lap show/hide and the click-eligibility window,
   // timed against the same START_DELAY / totalDuration / REPEAT_DELAY
   // cadence the drive/fall animation below uses (Framer Motion's
@@ -1289,7 +1333,7 @@ function SpriteCar({
   // so a rescued car doesn't have a stray "hide bubble" or "disable
   // clickability" timeout land on top of the permanent rescue state.
   React.useEffect(() => {
-    if (isStopped) return;
+    if (isStopped || isHidden) return;
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const loopPeriod = totalDuration + REPEAT_DELAY;
@@ -1318,9 +1362,9 @@ function SpriteCar({
       }, (lapStartDelay + loopPeriod) * 1000));
     };
 
-    scheduleLap(START_DELAY);
+    scheduleLap(lapStartDelay);
     return () => timeouts.forEach(clearTimeout);
-  }, [totalDuration, isStopped]);
+  }, [totalDuration, isStopped, isHidden, cycleId]);
 
   // Cycles through `phrases` on a timer, independent of the drive/fall
   // animation's own timeline — but only while the bubble is actually shown,
@@ -1356,47 +1400,71 @@ function SpriteCar({
   const controls = useAnimationControls();
 
   React.useEffect(() => {
-    if (isStopped) return;
-    controls.start({
-      opacity: [0, 1, 1, 0],
-      x: [startX, edgeX, fallX],
-      y: [rideY, rideY, fallY],
-      transition: {
-        // x deliberately does NOT share y's easing: 'linear' across both
-        // segments keeps horizontal velocity constant the whole way through
-        // (matching fallX's derivation above), so there's no deceleration
-        // blip right at the edge.
-        x: {
-          duration: totalDuration,
-          times: [0, t1, 1],
-          ease: ['linear', 'linear'],
-          repeat: Infinity,
-          repeatDelay: REPEAT_DELAY,
-          delay: START_DELAY,
+    if (isStopped || isHidden) return;
+    let cancelled = false;
+
+    const startLap = () => {
+      // Move back to the start of the lap (already invisible at this point),
+      // so a resumed lap doesn't begin from wherever the car froze.
+      controls.set({ x: startX, y: rideY, opacity: 0 });
+      setRotateCycleId(cycleId);
+      controls.start({
+        opacity: [0, 1, 1, 0],
+        x: [startX, edgeX, fallX],
+        y: [rideY, rideY, fallY],
+        transition: {
+          // x deliberately does NOT share y's easing: 'linear' across both
+          // segments keeps horizontal velocity constant the whole way through
+          // (matching fallX's derivation above), so there's no deceleration
+          // blip right at the edge.
+          x: {
+            duration: totalDuration,
+            times: [0, t1, 1],
+            ease: ['linear', 'linear'],
+            repeat: Infinity,
+            repeatDelay: REPEAT_DELAY,
+            delay: motionStartDelay,
+          },
+          // y stays flat (vy = 0) for the whole drive, then accelerates via
+          // 'easeIn' once the fall starts — this is the one axis that SHOULD
+          // start slow and speed up, mimicking gravity.
+          y: {
+            duration: totalDuration,
+            times: [0, t1, 1],
+            ease: ['linear', 'easeIn'],
+            repeat: Infinity,
+            repeatDelay: REPEAT_DELAY,
+            delay: motionStartDelay,
+          },
+          opacity: {
+            times: opacityTimes,
+            duration: totalDuration,
+            ease: ['easeOut', 'linear', 'easeIn'],
+            repeat: Infinity,
+            repeatDelay: REPEAT_DELAY,
+            delay: motionStartDelay,
+          },
         },
-        // y stays flat (vy = 0) for the whole drive, then accelerates via
-        // 'easeIn' once the fall starts — this is the one axis that SHOULD
-        // start slow and speed up, mimicking gravity.
-        y: {
-          duration: totalDuration,
-          times: [0, t1, 1],
-          ease: ['linear', 'easeIn'],
-          repeat: Infinity,
-          repeatDelay: REPEAT_DELAY,
-          delay: START_DELAY,
-        },
-        opacity: {
-          times: opacityTimes,
-          duration: totalDuration,
-          ease: ['easeOut', 'linear', 'easeIn'],
-          repeat: Infinity,
-          repeatDelay: REPEAT_DELAY,
-          delay: START_DELAY,
-        },
-      },
-    });
-    return () => controls.stop();
-  }, [controls, isStopped]);
+      });
+    };
+
+    if (cycleId === 0) {
+      startLap();
+    } else {
+      // Returning to the tab: fade the frozen car out where it is first,
+      // rather than snapping it away, then restart the lap.
+      controls
+        .start({ opacity: 0, transition: { duration: RESUME_FADE_OUT, ease: 'easeOut' } })
+        .then(() => {
+          if (!cancelled) startLap();
+        });
+    }
+
+    return () => {
+      cancelled = true;
+      controls.stop();
+    };
+  }, [controls, isStopped, isHidden, cycleId]);
 
   const handleCarClick = () => {
     if (!isClickable || isStopped) return;
@@ -1419,6 +1487,10 @@ function SpriteCar({
   const BUBBLE_OFFSET_Y = -4;
   const bubbleAnchorX = CAR_WIDTH / 2 + BUBBLE_OFFSET_X;
   const bubbleAnchorY = -CAR_HEIGHT / 2 + BUBBLE_OFFSET_Y;
+
+  // Bail out after all hooks have run (an early return above them would
+  // break React's rules of hooks).
+  if (reducedMotion) return null;
 
   return (
     // Outer group: position + opacity only, shared by the car art and the
@@ -1444,6 +1516,9 @@ function SpriteCar({
           accepted before DRIVE_DURATION, i.e. before this group's rotate
           keyframes have started moving away from 0. */}
       <motion.g
+        // Keyed by rotateCycleId so its repeat: Infinity rotate timeline restarts
+        // in step with the outer group whenever the lap is restarted.
+        key={rotateCycleId}
         initial={{ rotate: 0, scaleX: -1 }}
         animate={isStopped ? { rotate: 0, scaleX: -1 } : { rotate: [0, 0, 110], scaleX: -1 }}
         transition={
@@ -1455,7 +1530,7 @@ function SpriteCar({
                 ease: ['linear', 'easeIn'],
                 repeat: Infinity,
                 repeatDelay: REPEAT_DELAY,
-                delay: START_DELAY,
+                delay: motionStartDelay,
               }
         }
       >
