@@ -736,7 +736,7 @@ function ProjectsListView({
               )}
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <motion.div
               initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
               animate={{
