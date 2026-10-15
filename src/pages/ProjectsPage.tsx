@@ -448,7 +448,17 @@ const VIEW_SWITCH_GAP = 0.15;
 const VIEW_SWITCH_ENTER_DURATION = 0.3;
 
 const PROJECTS_LIST_HEADLINE =
-  "Hi, this is Usman! I use design and code to turn complex enterprise problems into enjoyable software that anyone can use.";
+  "Hi, this is Usman!";
+
+// Space above the list view's cover image.
+const LIST_COVER_TOP_SPACE = 12;
+
+// Vertical position of the SpriteCar, measured from the BOTTOM edge of the
+// image it drives across, in pixels. 0 puts the wheels right on the bottom
+// edge; positive numbers move the car UP, negative numbers move it down.
+// One value per view so each can be tuned independently.
+const CANVAS_CAR_Y_FROM_BOTTOM = 70;
+const LIST_CAR_Y_FROM_BOTTOM = 70;
 
 function ProjectsListView({
   images,
@@ -474,6 +484,42 @@ function ProjectsListView({
   const [projectsTab, setProjectsTab] = React.useState<'selected' | 'experiments'>('selected');
   const [hoverTab, setHoverTab] = React.useState<'selected' | 'experiments' | null>(null);
   const tabBorderLength = 214;
+
+  // The list view's own SpriteCar drives along the top edge of the cover
+  // image. SpriteCar works in plain SVG coordinates, so the cover gets a
+  // transparent <svg> overlaid exactly on top of it (see the markup below),
+  // and the car's target is just that SVG's own box: { x: 0, y: 0, width,
+  // height }. Measured from the rendered <img> because its size depends on
+  // the column width and on the image's aspect ratio, and its height is 0
+  // until the image has actually loaded.
+  const coverRef = React.useRef<HTMLImageElement>(null);
+  const [coverSize, setCoverSize] = React.useState<{ width: number; height: number } | null>(null);
+  React.useLayoutEffect(() => {
+    const el = coverRef.current;
+    if (!el) return;
+    const update = () => {
+      // Wait until the browser knows the image's real dimensions. Before
+      // that, the <img> still has its 1px top + bottom border, so
+      // offsetHeight reads as 2 rather than 0 -- measuring then would put
+      // the car's "bottom edge" right at the top of the cover.
+      if (!el.naturalHeight) return;
+      if (el.offsetWidth && el.offsetHeight) {
+        setCoverSize((prev) =>
+          prev && prev.width === el.offsetWidth && prev.height === el.offsetHeight
+            ? prev
+            : { width: el.offsetWidth, height: el.offsetHeight }
+        );
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const prefersReducedMotion = React.useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
 
   // Preload + decode every list thumbnail on mount, including the ones in
   // the tab that isn't showing yet. Each tab's <img> only mounts when that
@@ -555,6 +601,11 @@ function ProjectsListView({
         position: 'absolute',
         inset: 0,
         overflowY: 'auto',
+        // The car's speech bubble sticks out past the cover's right edge at
+        // the start of each lap. Without this, the browser would let that
+        // overflow scroll sideways (overflowY: auto makes the x-axis
+        // scrollable too), which shows up as a horizontal wobble on phones.
+        overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
         color: 'var(--color-text)',
       }}
@@ -563,7 +614,7 @@ function ProjectsListView({
         style={{
           paddingLeft: padding,
           paddingRight: padding,
-          paddingTop: 'clamp(96px, 10vw, 164px)', // clears the fixed navbar; see bottomMenu.module.css
+          paddingTop: 'clamp(96px, 10vw, 132px)', // clears the fixed navbar; see bottomMenu.module.css
           boxSizing: 'border-box',
         }}
       >
@@ -579,7 +630,7 @@ function ProjectsListView({
             gap: 'clamp(64px, 10vw, 80px)',
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <motion.div
               initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
               animate={{
@@ -620,11 +671,70 @@ function ProjectsListView({
               style={{
                   fontFamily: 'AspektaVF',
                   fontSize: 'clamp(12px, 3.5vw, 16px)',
+                  boxSizing: 'border-box',
+                  lineHeight: '1.65',
                   fontWeight: '300',
                   color: 'var(--color-text-subtle)'}}
             >
-              With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
+              I use design and code to turn complex enterprise problems into enjoyable software that anyone can use. With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
             </motion.h2>
+            {/* Cover image + the list view's SpriteCar. The wrapper is the
+                positioning context: the <svg> overlay sits exactly on top
+                of the image, with overflow: visible so the car can ride
+                above the top edge and fall past the bottom edge. */}
+            <div style={{ position: 'relative', marginTop: LIST_COVER_TOP_SPACE }}>
+              <motion.img
+                ref={coverRef}
+                initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+                animate={{
+                  opacity: headerAnimationDone ? 1 : 0,
+                  y: headerAnimationDone ? 0 : -8,
+                  filter: headerAnimationDone ? 'blur(0px)' : 'blur(4px)',
+                  ...SETTLED_FILTER(headerAnimationDone),
+                }}
+                transition={{ duration: 0.5, delay: 0.45, ease: 'easeInOut' }}
+                onUpdate={FORCE_JS_ANIMATION}
+                src="./website-cover-list-2.webp"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  // Keeps the 1px border inside that 100%, so the cover is
+                  // exactly column-width instead of 2px wider than the cards.
+                  boxSizing: 'border-box',
+                  borderRadius: '12px',
+                  border: '1px solid var(--color-border-muted)',
+                }}
+              />
+              {coverSize && (
+                <svg
+                  width={coverSize.width}
+                  height={coverSize.height}
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    overflow: 'visible',
+                    // The overlay itself never blocks clicks; the car's own
+                    // <image> opts back in only during its clickable window.
+                    pointerEvents: 'none',
+                    // Keeps the falling car above the tabs and cards below.
+                    zIndex: 2,
+                  }}
+                >
+                  <SpriteCar
+                    // A lap in progress keeps the x/y positions it began with,
+                    // so remount whenever the cover's size changes (window
+                    // resize, phone rotation). Height matters too now that the
+                    // car is anchored to the bottom edge.
+                    key={`${Math.round(coverSize.width)}x${Math.round(coverSize.height)}`}
+                    target={{ x: 0, y: 0, width: coverSize.width, height: coverSize.height }}
+                    yFromBottom={LIST_CAR_Y_FROM_BOTTOM}
+                    reducedMotion={prefersReducedMotion}
+                  />
+                </svg>
+              )}
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <motion.div
@@ -835,7 +945,11 @@ function ProjectsListView({
                   >
                     <button
                       className="card"
-                      style={{background: 'none', border: 'none', textAlign: 'left'}}
+                      // <button> comes with the browser's own padding (about 6px
+                      // left and right in Chrome/Safari), which made these cards
+                      // narrower than the cover image above. Zeroing it, plus
+                      // an explicit full width, lines their edges up exactly.
+                      style={{background: 'none', border: 'none', textAlign: 'left', padding: 0, margin: 0, width: '100%', boxSizing: 'border-box'}}
                       onClick={() =>
                         unlockedCaseStudies
                           ? navigate('/bddigest')
@@ -861,7 +975,11 @@ function ProjectsListView({
                     </button>
                     <button
                       className="card"
-                      style={{background: 'none', border: 'none', textAlign: 'left'}}
+                      // <button> comes with the browser's own padding (about 6px
+                      // left and right in Chrome/Safari), which made these cards
+                      // narrower than the cover image above. Zeroing it, plus
+                      // an explicit full width, lines their edges up exactly.
+                      style={{background: 'none', border: 'none', textAlign: 'left', padding: 0, margin: 0, width: '100%', boxSizing: 'border-box'}}
                       onClick={() =>
                         unlockedCaseStudies
                           ? navigate('/aipatterns')
@@ -924,7 +1042,11 @@ function ProjectsListView({
                   >
                     <button
                       className="card"
-                      style={{background: 'none', border: 'none', textAlign: 'left'}}
+                      // <button> comes with the browser's own padding (about 6px
+                      // left and right in Chrome/Safari), which made these cards
+                      // narrower than the cover image above. Zeroing it, plus
+                      // an explicit full width, lines their edges up exactly.
+                      style={{background: 'none', border: 'none', textAlign: 'left', padding: 0, margin: 0, width: '100%', boxSizing: 'border-box'}}
                       onClick={() =>
                         window.open(
                           'https://usmankhanusmankhan.github.io/reading-journal/',
@@ -1168,7 +1290,7 @@ function SpeechBubbleContent({
         d={speechBubblePath(bubbleWidth, BUBBLE_HEIGHT, BUBBLE_RADIUS)}
         // #e5484d matches the existing error-state red used for the password
         // field elsewhere in this file; #30a46c is that same palette's green.
-        fill={isWarning ? 'oklch(0.6265 0.2408 22.98)' : isSuccess ? 'oklch(0.6383 0.1496 157.68)' : 'var(--color-accent)'}
+        fill={isWarning ? 'oklch(0.6265 0.2408 22.98)' : isSuccess ? 'oklch(0.6383 0.2565 309.18)' : 'var(--color-accent)'}
         style={{ filter: 'drop-shadow(0 2px 8px var(--color-modal-shadow))' }}
       />
       <text
@@ -1197,10 +1319,13 @@ function SpeechBubbleContent({
 // interval. Panning/zooming re-renders this component on every pointer move
 // via setCamera, so the interval never survived long enough to fire. A
 // stable module-level reference fixes that.
-const DEFAULT_SPRITE_CAR_PHRASES = ["don't mind me, just cruising along...", 'hm the edge is getting closer...', 'ok this might be bad!', "ok this is for sure bad!!!", "uh guys?? GUYS???", "AHHHH!!!!"];
+const DEFAULT_SPRITE_CAR_PHRASES = ["don't mind me at all...", 'hm the edge is getting closer...', 'ok this might be bad!', "ok this is for sure bad!!!", "uh guys?? GUYS???", "AHHHH!!!!"];
 
 interface SpriteCarProps {
   target: { x: number; y: number; width: number; height: number };
+  // Where the car's wheels sit, in px measured up from the target's bottom
+  // edge. 0 = on the bottom edge, positive = higher, negative = lower.
+  yFromBottom?: number;
   reducedMotion: boolean;
   phrases?: string[];
   phraseDuration?: number; // seconds each phrase stays up before the next one swaps in
@@ -1208,9 +1333,10 @@ interface SpriteCarProps {
 
 function SpriteCar({
   target,
+  yFromBottom = 0,
   reducedMotion,
   phrases = DEFAULT_SPRITE_CAR_PHRASES,
-  phraseDuration = 2.5,
+  phraseDuration = 2.28,
 }: SpriteCarProps) {
   const [phraseIndex, setPhraseIndex] = React.useState(0);
 
@@ -1231,8 +1357,10 @@ function SpriteCar({
   const WHEEL_CONTACT_Y_LOCAL = CAR_HEIGHT;
 
   const START_POSITION_ADJUST_X = 64;
-  const POSITION_ADJUST_Y = 0;
-  const rideY = target.y - POSITION_ADJUST_Y - (WHEEL_CONTACT_Y_LOCAL - CAR_HEIGHT / 2);
+  // Anchored to the target's bottom edge: the wheels sit yFromBottom px
+  // above it (SVG y grows downward, so moving up means subtracting).
+  const targetBottom = target.y + target.height;
+  const rideY = targetBottom - yFromBottom - (WHEEL_CONTACT_Y_LOCAL - CAR_HEIGHT / 2);
   const startX = target.x + target.width + CAR_WIDTH / 2 - START_POSITION_ADJUST_X;
   const edgeX = (target.x - CAR_WIDTH / 2) + 8;
   const fallY = rideY + 500; // well past the bottom of the thumbnail
@@ -1254,7 +1382,7 @@ function SpriteCar({
   // Held back a few seconds after page load so the car isn't competing with
   // everything else fading/settling in. `delay` only applies once, before the
   // first pass — it doesn't get re-added on every drive/fall loop.
-  const START_DELAY = 1.75;
+  const START_DELAY = 1.65;
 
   // Shared with the `default`/`opacity`/inner-rotate transitions below, so
   // the phrase-reset timer (which can't rely on Framer Motion's onComplete —
@@ -1263,7 +1391,7 @@ function SpriteCar({
 
   // Seconds into each drive before the bubble shows up and starts cycling —
   // the car drives a little while first before it starts "talking."
-  const BUBBLE_START_DELAY = 0.77;
+  const BUBBLE_START_DELAY = 1.5;
 
   const [bubbleActive, setBubbleActive] = React.useState(false);
 
@@ -1366,16 +1494,20 @@ function SpriteCar({
     return () => timeouts.forEach(clearTimeout);
   }, [totalDuration, isStopped, isHidden, cycleId]);
 
-  // Cycles through `phrases` on a timer, independent of the drive/fall
+  // Steps through `phrases` on a timer, independent of the drive/fall
   // animation's own timeline — but only while the bubble is actually shown,
-  // and never once a rescueMessage takes over.
+  // and never once a rescueMessage takes over. Each phrase plays at most
+  // once per lap: the cycle stops on the last phrase and holds it until
+  // the bubble hides, instead of wrapping back to the first one. The next
+  // lap starts over from phrase 0 (the lap scheduler resets phraseIndex).
   React.useEffect(() => {
     if (!bubbleActive || phrases.length <= 1 || rescueMessage) return;
-    const interval = setInterval(() => {
-      setPhraseIndex((i) => (i + 1) % phrases.length);
+    if (phraseIndex >= phrases.length - 1) return; // on the last phrase: hold it
+    const timeout = setTimeout(() => {
+      setPhraseIndex((i) => Math.min(i + 1, phrases.length - 1));
     }, phraseDuration * 1000);
-    return () => clearInterval(interval);
-  }, [phrases, phraseDuration, bubbleActive, rescueMessage]);
+    return () => clearTimeout(timeout);
+  }, [phrases, phraseDuration, bubbleActive, rescueMessage, phraseIndex]);
 
   // Opacity keyframes as fractions of totalDuration: fade in right after the
   // loop starts, hold at full opacity through the drive and most of the fall,
@@ -2539,8 +2671,13 @@ export default function ProjectsPage() {
           <AnimatePresence mode="wait">
             {isMounted && !isExiting && (
               <SpriteCar
-                key={`${category}-${spriteCarRunId}`}
+                // Size is part of the key because a running lap keeps the
+                // positions it started with: if the cover's dimensions change
+                // (breakpoint change), remount so the car re-anchors to the
+                // new bottom edge instead of staying at the old height.
+                key={`${category}-${spriteCarRunId}-${usmanIntro.width}x${usmanIntro.height}`}
                 target={usmanIntro}
+                yFromBottom={CANVAS_CAR_Y_FROM_BOTTOM}
                 reducedMotion={capabilities.prefersReducedMotion}
               />
             )}
