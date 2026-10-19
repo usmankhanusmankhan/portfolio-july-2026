@@ -448,7 +448,7 @@ const VIEW_SWITCH_GAP = 0.15;
 const VIEW_SWITCH_ENTER_DURATION = 0.3;
 
 const PROJECTS_LIST_HEADLINE =
-  "Hi, this is Usman!";
+  "I'm Usman, a designer for complex enterprise and legal services";
 
 // Space above the list view's cover image.
 const LIST_COVER_TOP_SPACE = 12;
@@ -676,7 +676,7 @@ function ProjectsListView({
                   fontWeight: '300',
                   color: 'var(--color-text-subtle)'}}
             >
-              I use design and code to turn complex enterprise problems into enjoyable software that anyone can use. With experience at Intapp, IBM, and argodesign, I care about maintaining systems at scale that people rely on.
+              I use strategy, code, and motion to make enjoyable software in highly ambiguous problem spaces. With 3 years of B2B and design consultancy experience, I care about maintaining systems at scale that people rely on.
             </motion.h2>
             {/* Cover image + the list view's SpriteCar. The wrapper is the
                 positioning context: the <svg> overlay sits exactly on top
